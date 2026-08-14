@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Sahih</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="dashboard-page">
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <div>
+          <div class="sidebar-brand">
+            <div class="mini-logo">S</div>
+            <span>Sahih</span>
+          </div>
+
+          <nav class="sidebar-nav" id="sidebar-nav">
+            <a href="dashboard.html" class="active">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                  <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                  <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                  <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                </svg>
+              </span>
+              Dashboard
+            </a>
+            <a href="upload.html">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M12 16V4"></path>
+                  <path d="M7 9l5-5 5 5"></path>
+                  <rect x="4" y="16" width="16" height="4" rx="1.5"></rect>
+                </svg>
+              </span>
+              Upload
+            </a>
+            <a href="riwayat.html">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+                  <path d="M3 4v5h5"></path>
+                  <path d="M12 7v5l3 2"></path>
+                </svg>
+              </span>
+              Riwayat
+            </a>
+            <a href="profil.html">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
+                </svg>
+              </span>
+              Profil
+            </a>
+          </nav>
+        </div>
+
+        <div class="sidebar-bottom">
+          <button id="logout-btn" class="logout-btn" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <path d="M16 17l5-5-5-5"></path>
+                <path d="M21 12H9"></path>
+              </svg>
+            </span>
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <main class="dashboard-main">
+        <header class="dashboard-header">
+          <div>
+            <h1>Selamat pagi, <span id="greeting-name">Andi</span></h1>
+            <p>Berikut ringkasan aktivitas verifikasi dokumen akademik kamu.</p>
+          </div>
+          <div class="header-actions">
+            <button
+              class="primary-btn small"
+              onclick="window.location.href = 'upload.html'"
+            >
+              + Upload Dokumen
+            </button>
+          </div>
+        </header>
+
+        <section class="stats-grid">
+          <article class="stat-card">
+            <h3 id="stat-total">0</h3>
+            <p>Total diverifikasi</p>
+          </article>
+          <article class="stat-card">
+            <h3 class="text-green" id="stat-asli">0</h3>
+            <p>Asli</p>
+          </article>
+          <article class="stat-card">
+            <h3 class="text-red" id="stat-palsu">0</h3>
+            <p>Terindikasi palsu</p>
+          </article>
+          <article class="stat-card">
+            <h3 id="stat-latest">-</h3>
+            <p>Terakhir verifikasi</p>
+          </article>
+        </section>
+
+        <section class="table-section">
+          <div class="table-head">
+            <h2>Riwayat Terkini</h2>
+            <a href="riwayat.html" class="text-link">Lihat semua</a>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>DOKUMEN</th>
+                  <th>WAKTU</th>
+                  <th>KEYAKINAN</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-history-body">
+                <tr>
+                  <td colspan="4" class="table-empty">
+                    Memuat data riwayat...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

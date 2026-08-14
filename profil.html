@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil - Sahih</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="dashboard-page">
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <div>
+          <div class="sidebar-brand">
+            <div class="mini-logo">S</div>
+            <span>Sahih</span>
+          </div>
+
+          <nav class="sidebar-nav" id="sidebar-nav">
+            <a href="dashboard.html">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                  <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                  <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                  <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                </svg>
+              </span>
+              Dashboard
+            </a>
+            <a href="upload.html">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M12 16V4"></path>
+                  <path d="M7 9l5-5 5 5"></path>
+                  <rect x="4" y="16" width="16" height="4" rx="1.5"></rect>
+                </svg>
+              </span>
+              Upload
+            </a>
+            <a href="riwayat.html">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+                  <path d="M3 4v5h5"></path>
+                  <path d="M12 7v5l3 2"></path>
+                </svg>
+              </span>
+              Riwayat
+            </a>
+            <a href="profil.html" class="active">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
+                </svg>
+              </span>
+              Profil
+            </a>
+          </nav>
+        </div>
+
+        <div class="sidebar-bottom">
+          <button id="logout-btn" class="logout-btn" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <path d="M16 17l5-5-5-5"></path>
+                <path d="M21 12H9"></path>
+              </svg>
+            </span>
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <main class="dashboard-main">
+        <header class="dashboard-header">
+          <div>
+            <h1>Profil Pengguna</h1>
+            <p>Kelola informasi akun dan preferensi notifikasi pribadi Anda.</p>
+          </div>
+        </header>
+
+        <section class="panel-grid">
+          <article class="panel-card">
+            <h3>Informasi Pribadi</h3>
+            <div class="profile-list">
+              <div class="profile-item">
+                <span>Nama Lengkap</span>
+                <span id="profile-name">-</span>
+              </div>
+              <div class="profile-item">
+                <span>Email</span>
+                <span id="profile-email">-</span>
+              </div>
+              <div class="profile-item">
+                <span>Dibuat Pada</span>
+                <span id="profile-created-at">-</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel-card">
+            <h3>Ubah Akun</h3>
+            <form id="profile-form" class="auth-form profile-form" novalidate>
+              <label class="input-group">
+                <span class="input-icon" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="8" r="4"></circle>
+                    <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  id="profile-username-input"
+                  name="username"
+                  placeholder="Username baru"
+                />
+              </label>
+
+              <label class="input-group">
+                <span class="input-icon" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                  </svg>
+                </span>
+                <input
+                  type="password"
+                  id="profile-password-input"
+                  name="password"
+                  placeholder="Password baru"
+                />
+              </label>
+
+              <label class="input-group">
+                <span class="input-icon" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                  </svg>
+                </span>
+                <input
+                  type="password"
+                  id="profile-password-confirm-input"
+                  name="confirmPassword"
+                  placeholder="Konfirmasi password baru"
+                />
+              </label>
+
+              <button type="submit" class="primary-btn">
+                Simpan Perubahan
+              </button>
+            </form>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

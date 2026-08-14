@@ -1,0 +1,1280 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Dokumen - Sahih</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Custom Styling Khusus Elemen Upload (Dipertahankan agar fungsi berjalan baik) */
+      :root {
+        --indigo-600: #4f46e5;
+        --indigo-700: #4338ca;
+        --indigo-50: #eef0fd;
+        --ink-900: #1c2130;
+        --ink-600: #565e72;
+        --ink-400: #8b93a7;
+        --line: #e6e8f0;
+        --bg: #f4f5fa;
+        --card: #ffffff;
+        --red-600: #dc2626;
+        --red-50: #fdecec;
+        --green-600: #16a34a;
+        --green-50: #eaf7ee;
+        --amber-600: #b45309;
+        --amber-50: #fdf3e2;
+        --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      }
+
+      /* Transisi Tampilan */
+      .screen {
+        display: none;
+      }
+      .screen.active {
+        display: block;
+        animation: fade 0.25s ease;
+      }
+      @keyframes fade {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* Komponen Upload & Scan */
+      .page-head {
+        margin-bottom: 22px;
+      }
+      .page-head h1 {
+        font-size: 21px;
+        margin: 0 0 4px;
+        letter-spacing: -0.01em;
+      }
+      .page-head p {
+        margin: 0;
+        color: var(--ink-600);
+        font-size: 13.5px;
+      }
+
+      .layout-with-file {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+      .file-card {
+        width: 240px;
+        flex-shrink: 0;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 18px;
+        text-align: center;
+      }
+      .file-thumb {
+        width: 56px;
+        height: 56px;
+        border-radius: 10px;
+        background: var(--indigo-50);
+        color: var(--indigo-700);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 11px;
+        margin: 0 auto 12px;
+      }
+      .file-name {
+        font-weight: 600;
+        font-size: 13px;
+        word-break: break-word;
+      }
+      .file-meta {
+        font-size: 11.5px;
+        color: var(--ink-400);
+        margin-top: 3px;
+      }
+
+      .steps-mini {
+        margin-top: 22px;
+        text-align: left;
+      }
+      .steps-mini-label {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--ink-400);
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+      .step-mini {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+        font-size: 12.5px;
+        color: var(--ink-400);
+      }
+      .step-mini.current {
+        color: var(--indigo-700);
+        font-weight: 600;
+      }
+      .step-mini.done {
+        color: var(--ink-600);
+      }
+      .step-mini .b {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--line);
+        flex-shrink: 0;
+      }
+      .step-mini.current .b {
+        background: var(--indigo-600);
+      }
+      .step-mini.done .b {
+        background: var(--ink-400);
+      }
+
+      .panel {
+        flex: 1;
+        min-width: 300px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 28px;
+      }
+
+      /* Upload Area */
+      .dropzone {
+        border: 1.5px dashed #c7cbe6;
+        border-radius: 12px;
+        padding: 52px 20px;
+        text-align: center;
+        background: #fbfbfe;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+        cursor: pointer;
+      }
+      .dropzone.drag {
+        border-color: var(--indigo-600);
+        background: var(--indigo-50);
+      }
+      .dropzone svg {
+        color: var(--indigo-600);
+        margin-bottom: 10px;
+      }
+      .dz-title {
+        font-weight: 600;
+        font-size: 14.5px;
+        margin-bottom: 4px;
+      }
+      .dz-sub {
+        font-size: 12px;
+        color: var(--ink-400);
+        margin-bottom: 16px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 8px;
+        padding: 9px 18px;
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        transition: 0.2s ease;
+      }
+      .btn-primary {
+        background: var(--indigo-600);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--indigo-700);
+      }
+      .btn-primary:disabled {
+        background: #c9c9e0;
+        cursor: not-allowed;
+      }
+      .btn-ghost {
+        background: #fff;
+        color: var(--indigo-700);
+        border: 1px solid var(--line);
+      }
+      .btn-ghost:hover {
+        background: var(--indigo-50);
+      }
+      .btn-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .recent {
+        margin-top: 22px;
+      }
+      .recent-label {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--ink-400);
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+      .recent-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        font-size: 13px;
+      }
+      .recent-item .ic {
+        color: var(--indigo-600);
+      }
+      .recent-item .nm {
+        font-weight: 600;
+        flex: 1;
+      }
+      .recent-item .sz {
+        color: var(--ink-400);
+        font-size: 12px;
+      }
+      .badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 20px;
+      }
+      .badge-wait {
+        background: var(--amber-50);
+        color: var(--amber-600);
+      }
+      .warn-inline {
+        font-size: 12px;
+        color: var(--red-600);
+        margin-top: 10px;
+        display: none;
+      }
+
+      /* Memindai (Scanning) */
+      .scan-center {
+        text-align: center;
+        padding: 34px 10px 8px;
+      }
+      .spinner {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: 3px solid var(--indigo-50);
+        border-top-color: var(--indigo-600);
+        margin: 0 auto 18px;
+        animation: spin 0.9s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .scan-title {
+        font-weight: 700;
+        font-size: 16px;
+      }
+      .scan-sub {
+        font-size: 12.5px;
+        color: var(--ink-400);
+        margin-top: 2px;
+      }
+      .scan-steps {
+        max-width: 340px;
+        margin: 26px auto 0;
+        text-align: left;
+      }
+      .scan-step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 0;
+        font-size: 13px;
+        color: var(--ink-400);
+      }
+      .scan-step .icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+      .scan-step.pending .icon {
+        border-radius: 50%;
+        border: 1.5px solid var(--line);
+      }
+      .scan-step.active {
+        color: var(--indigo-700);
+        font-weight: 600;
+      }
+      .scan-step.active .icon {
+        border-radius: 50%;
+        border: 2px solid var(--indigo-600);
+        border-top-color: transparent;
+        animation: spin 0.8s linear infinite;
+      }
+      .scan-step.done {
+        color: var(--ink-600);
+      }
+      .scan-step.done .icon::after {
+        content: "✓";
+        color: var(--green-600);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .scan-note {
+        margin-top: 26px;
+        font-size: 11.5px;
+        color: var(--ink-400);
+        border-top: 1px solid var(--line);
+        padding-top: 14px;
+      }
+
+      /* Hasil */
+      .result-center {
+        text-align: center;
+        padding: 26px 10px 8px;
+      }
+      .result-score {
+        font-size: 40px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .result-score.bad {
+        color: var(--red-600);
+      }
+      .result-score.good {
+        color: var(--green-600);
+      }
+      .result-score.neutral {
+        color: var(--ink-600);
+      }
+      .result-label {
+        font-size: 16px;
+        font-weight: 700;
+        margin-top: 6px;
+      }
+      .result-label.bad {
+        color: var(--red-600);
+      }
+      .result-label.good {
+        color: var(--green-600);
+      }
+      .result-label.neutral {
+        color: var(--ink-600);
+      }
+      .result-file {
+        font-size: 12.5px;
+        color: var(--ink-400);
+        margin-top: 3px;
+      }
+      .result-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 26px;
+        flex-wrap: wrap;
+      }
+      .result-hint {
+        margin-top: 22px;
+        font-size: 12px;
+        color: var(--ink-400);
+        max-width: 380px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Laporan Lengkap */
+      .report {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 34px 36px;
+      }
+      .report-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-bottom: 18px;
+        border-bottom: 2px solid var(--indigo-600);
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      .report-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        color: #ffffff;
+        background: linear-gradient(135deg, var(--indigo-600), #818cf8);
+        font-weight: 800;
+      }
+      .report-brand-text .name {
+        font-weight: 800;
+        font-size: 15px;
+      }
+      .report-brand-text .sub {
+        font-size: 10px;
+        color: var(--ink-400);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .report-no {
+        text-align: right;
+        font-size: 10.5px;
+        color: var(--ink-400);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .report h2 {
+        font-size: 18px;
+        margin: 22px 0 16px;
+      }
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 18px;
+        margin-bottom: 24px;
+      }
+      .meta-grid .lbl {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--ink-400);
+        margin-bottom: 4px;
+      }
+      .meta-grid .val {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .sec-eyebrow {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--ink-400);
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .exec-summary {
+        font-size: 13.5px;
+        line-height: 1.6;
+        color: var(--ink-900);
+        margin-bottom: 16px;
+      }
+      .conclusion {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 18px;
+        border-radius: 10px;
+        margin-bottom: 26px;
+      }
+      .conclusion.bad {
+        background: var(--red-50);
+      }
+      .conclusion.good {
+        background: var(--green-50);
+      }
+      .conclusion.neutral {
+        background: var(--bg);
+      }
+      .conclusion .num {
+        font-size: 24px;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+      .conclusion.bad .num {
+        color: var(--red-600);
+      }
+      .conclusion.good .num {
+        color: var(--green-600);
+      }
+      .conclusion.neutral .num {
+        color: var(--ink-600);
+      }
+      .conclusion .txt .k {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--ink-400);
+      }
+      .conclusion .txt .v {
+        font-weight: 700;
+        font-size: 14.5px;
+      }
+      .conclusion.bad .txt .v {
+        color: var(--red-600);
+      }
+      .conclusion.good .txt .v {
+        color: var(--green-600);
+      }
+      .conclusion.neutral .txt .v {
+        color: var(--ink-600);
+      }
+
+      table.findings {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 22px;
+        font-size: 12.5px;
+      }
+      table.findings th {
+        text-align: left;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ink-400);
+        border-bottom: 1px solid var(--line);
+        padding: 0 10px 8px;
+      }
+      table.findings td {
+        padding: 11px 10px;
+        border-bottom: 1px solid var(--line);
+      }
+      .lvl {
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 2px 9px;
+        border-radius: 20px;
+      }
+      .lvl-tinggi {
+        background: var(--red-50);
+        color: var(--red-600);
+      }
+      .lvl-sedang {
+        background: var(--amber-50);
+        color: var(--amber-600);
+      }
+      .lvl-rendah {
+        background: var(--green-50);
+        color: var(--green-600);
+      }
+      .lvl-netral {
+        background: var(--bg);
+        color: var(--ink-600);
+      }
+
+      .disclaimer-box {
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px 16px;
+        font-size: 12px;
+        color: var(--ink-600);
+        margin-bottom: 22px;
+        line-height: 1.55;
+      }
+      .report-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-top: 1px dashed var(--line);
+        padding-top: 16px;
+        margin-top: 6px;
+        flex-wrap: wrap;
+      }
+      .report-foot .note {
+        font-size: 11px;
+        color: var(--ink-400);
+      }
+      .report-foot .hashline {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--ink-400);
+        text-align: right;
+      }
+
+      .top-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+
+      .err-box {
+        background: var(--red-50);
+        color: var(--red-600);
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-size: 13px;
+        margin-top: 16px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <div>
+          <div class="sidebar-brand">
+            <div class="mini-logo">S</div>
+            <span>Sahih</span>
+          </div>
+
+          <nav class="sidebar-nav" id="sidebar-nav">
+            <a href="dashboard.html">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                  <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                  <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                  <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                </svg>
+              </span>
+              Dashboard
+            </a>
+            <a href="upload.html" class="active">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M12 16V4"></path>
+                  <path d="M7 9l5-5 5 5"></path>
+                  <rect x="4" y="16" width="16" height="4" rx="1.5"></rect>
+                </svg>
+              </span>
+              Upload
+            </a>
+            <a href="riwayat.html">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+                  <path d="M3 4v5h5"></path>
+                  <path d="M12 7v5l3 2"></path>
+                </svg>
+              </span>
+              Riwayat
+            </a>
+            <a href="profil.html">
+              <span class="nav-icon" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path>
+                </svg>
+              </span>
+              Profil
+            </a>
+          </nav>
+        </div>
+
+        <div class="sidebar-bottom">
+          <button id="logout-btn" class="logout-btn" type="button">
+            <span class="nav-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <path d="M16 17l5-5-5-5"></path>
+                <path d="M21 12H9"></path>
+              </svg>
+            </span>
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <main class="dashboard-main upload-main">
+        <header class="dashboard-header">
+          <div>
+            <h1>Unggah Dokumen</h1>
+            <p>Tarik file ke area di bawah, atau pilih dari komputer.</p>
+          </div>
+          <div class="header-actions">
+            <button
+              class="btn btn-primary"
+              type="button"
+              onclick="window.location.href = 'dashboard.html'"
+            >
+              Ke Dashboard
+            </button>
+          </div>
+        </header>
+
+        <section class="screen active" id="screen-upload">
+          <div class="panel">
+            <div class="dropzone" id="dropzone">
+              <svg
+                width="34"
+                height="34"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path d="M12 16V4M12 4l-4 4M12 4l4 4" />
+                <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+              </svg>
+              <div class="dz-title">Tarik &amp; lepas dokumen di sini</div>
+              <div class="dz-sub">
+                PDF · maks 10&nbsp;MB (validasi ukuran di sisi browser)
+              </div>
+              <button class="btn btn-ghost" id="pickFileBtn">Pilih File</button>
+              <input
+                type="file"
+                id="fileInput"
+                accept=".pdf,application/pdf"
+                style="display: none"
+              />
+            </div>
+            <div class="warn-inline" id="uploadWarn"></div>
+
+            <div class="recent" id="recentWrap" style="display: none">
+              <div class="recent-label">File Dipilih</div>
+              <div class="recent-item">
+                <span class="ic">📄</span>
+                <span class="nm" id="recentName">–</span>
+                <span class="sz" id="recentSize">–</span>
+                <span class="badge badge-wait">Siap dianalisis</span>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-primary" id="startScanBtn" disabled>
+                Mulai Analisis
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-scan">
+          <div class="page-head">
+            <h1>Memindai</h1>
+            <p>Progres pemeriksaan otomatis.</p>
+          </div>
+          <div class="layout-with-file">
+            <div class="file-card">
+              <div class="file-thumb">PDF</div>
+              <div class="file-name" id="fcName">–</div>
+              <div class="file-meta" id="fcMeta">–</div>
+              <div class="steps-mini">
+                <div class="steps-mini-label">Tahap Verifikasi</div>
+                <div class="step-mini done"><span class="b"></span>Unggah</div>
+                <div class="step-mini current">
+                  <span class="b"></span>Memindai
+                </div>
+                <div class="step-mini"><span class="b"></span>Hasil</div>
+                <div class="step-mini"><span class="b"></span>Laporan</div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="scan-center">
+                <div class="spinner"></div>
+                <div class="scan-title">Memindai Dokumen</div>
+                <div class="scan-sub" id="scanSubName">–</div>
+                <div class="scan-steps" id="scanSteps"></div>
+                <div class="scan-note">
+                  Seluruh langkah di atas dijalankan server dalam satu
+                  permintaan tunggal — tampilan ini adalah simulasi progres di
+                  browser.
+                </div>
+              </div>
+              <div class="err-box" id="scanErr"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-hasil">
+          <div class="page-head">
+            <h1>Hasil</h1>
+            <p>Ringkasan cepat sebelum laporan penuh.</p>
+          </div>
+          <div class="layout-with-file">
+            <div class="file-card">
+              <div class="file-thumb">PDF</div>
+              <div class="file-name" id="hcName">–</div>
+              <div class="file-meta" id="hcMeta">–</div>
+              <div class="steps-mini">
+                <div class="steps-mini-label">Tahap Verifikasi</div>
+                <div class="step-mini done"><span class="b"></span>Unggah</div>
+                <div class="step-mini done">
+                  <span class="b"></span>Memindai
+                </div>
+                <div class="step-mini current">
+                  <span class="b"></span>Hasil
+                </div>
+                <div class="step-mini"><span class="b"></span>Laporan</div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="result-center">
+                <div class="result-score" id="resScorePct">–</div>
+                <div class="result-label" id="resLabel">–</div>
+                <div class="result-file" id="resScoreNote">
+                  Skor di atas 50% berarti cenderung palsu, di bawah 50% berarti
+                  cenderung asli.
+                </div>
+                <div class="result-file" id="resFileLine">–</div>
+                <div class="result-actions">
+                  <button class="btn btn-primary" id="toReportBtn">
+                    Lihat Laporan Lengkap
+                  </button>
+                  <button class="btn btn-ghost" id="backToUploadBtn">
+                    Analisis Dokumen Lain
+                  </button>
+                </div>
+                <div class="result-hint">
+                  Model AI hanya memeriksa pola byte dokumen. Ini bukan
+                  konfirmasi resmi dari penerbit ijazah — gunakan Laporan
+                  Lengkap untuk detail dan rekomendasi tindak lanjut.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-laporan">
+          <div class="page-head">
+            <h1>Laporan Lengkap</h1>
+            <p>Ringkasan, temuan model, dan rekomendasi.</p>
+          </div>
+          <div class="top-actions">
+            <button class="btn btn-ghost" id="printBtn">
+              Cetak / Simpan PDF
+            </button>
+            <button class="btn btn-ghost" id="backToUploadBtn2">
+              Analisis Dokumen Lain
+            </button>
+          </div>
+          <div class="report" id="reportRoot">
+            <div class="report-head">
+              <div class="report-brand">
+                <div class="brand-mark">S</div>
+                <div class="report-brand-text">
+                  <div class="name">Verifikasi</div>
+                  <div class="sub">Layanan Verifikasi Dokumen Akademik</div>
+                </div>
+              </div>
+              <div class="report-no">
+                No. Referensi<br /><span
+                  id="repNo"
+                  style="
+                    color: var(--ink-900);
+                    font-family: var(--mono);
+                    font-size: 12px;
+                  "
+                  >–</span
+                >
+              </div>
+            </div>
+
+            <h2>Laporan Hasil Pemeriksaan Dokumen</h2>
+            <div class="meta-grid">
+              <div>
+                <div class="lbl">Nama File</div>
+                <div class="val" id="repFileName">–</div>
+              </div>
+              <div>
+                <div class="lbl">Tanggal Analisis</div>
+                <div class="val" id="repDate">–</div>
+              </div>
+              <div>
+                <div class="lbl">Jenis Dokumen</div>
+                <div class="val">PDF (tidak diklasifikasi lebih lanjut)</div>
+              </div>
+            </div>
+
+            <div class="sec-eyebrow">I · Ringkasan Eksekutif</div>
+            <div class="exec-summary" id="repSummary">–</div>
+
+            <div class="conclusion" id="repConclusion">
+              <div class="num" id="repConclusionPct">–</div>
+              <div class="txt">
+                <div class="k">Kesimpulan Model</div>
+                <div class="v" id="repConclusionLabel">–</div>
+              </div>
+            </div>
+
+            <div class="sec-eyebrow">II · Detail Pemeriksaan</div>
+            <table class="findings">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Metode</th>
+                  <th>Hasil</th>
+                  <th>Skor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Analisis pola byte dokumen — model AI (LSTM)</td>
+                  <td id="repFindingResult">–</td>
+                  <td><span class="lvl" id="repFindingLevel">–</span></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="disclaimer-box">
+              Laporan ini dihasilkan otomatis dari satu model klasifikasi
+              berbasis pola byte berkas, tanpa pemeriksaan tanda tangan digital,
+              basis data PDDikti/Forlap, atau analisis metadata/font. Skor yang
+              ditampilkan adalah skor kepalsuan: semakin tinggi angkanya,
+              semakin kuat indikasi dokumen palsu. Hasil tetap bersifat
+              indikatif dan <strong>bukan</strong> konfirmasi resmi dari
+              institusi penerbit.
+            </div>
+
+            <div class="sec-eyebrow">III · Rekomendasi</div>
+            <div class="exec-summary" id="repRecommendation">–</div>
+
+            <div class="report-foot">
+              <div class="note">Dibuat otomatis oleh sistem Verifikasi</div>
+              <div class="hashline">SHA-256 · <span id="repHash">–</span></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+      // ---------- Config ----------
+      const API_URL = "http://127.0.0.1:8000/api/verify/";
+      const MAX_SIZE_MB = 10;
+
+      // ---------- State ----------
+      let selectedFile = null;
+      let apiResult = null;
+
+      // ---------- Helpers ----------
+      function showScreen(id) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+      }
+      function fmtSize(bytes) {
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + " KB";
+        return (bytes / 1024 / 1024).toFixed(1) + " MB";
+      }
+
+      // ---------- Screen 1: Upload ----------
+      const dropzone = document.getElementById("dropzone");
+      const fileInput = document.getElementById("fileInput");
+      const pickFileBtn = document.getElementById("pickFileBtn");
+      const startScanBtn = document.getElementById("startScanBtn");
+      const uploadWarn = document.getElementById("uploadWarn");
+      const recentWrap = document.getElementById("recentWrap");
+      const recentName = document.getElementById("recentName");
+      const recentSize = document.getElementById("recentSize");
+
+      pickFileBtn.addEventListener("click", () => fileInput.click());
+      dropzone.addEventListener("click", (e) => {
+        if (e.target === dropzone) fileInput.click();
+      });
+      ["dragover", "dragenter"].forEach((ev) =>
+        dropzone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          dropzone.classList.add("drag");
+        }),
+      );
+      ["dragleave", "drop"].forEach((ev) =>
+        dropzone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          dropzone.classList.remove("drag");
+        }),
+      );
+      dropzone.addEventListener("drop", (e) => {
+        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+      });
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length) handleFile(e.target.files[0]);
+      });
+
+      function handleFile(file) {
+        uploadWarn.style.display = "none";
+        if (
+          !file.name.toLowerCase().endsWith(".pdf") ||
+          file.type !== "application/pdf"
+        ) {
+          uploadWarn.textContent =
+            "Hanya file PDF yang didukung server saat ini.";
+          uploadWarn.style.display = "block";
+          startScanBtn.disabled = true;
+          recentWrap.style.display = "none";
+          return;
+        }
+        if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+          uploadWarn.textContent = `File melebihi batas ${MAX_SIZE_MB} MB (pemeriksaan ini dilakukan di browser).`;
+          uploadWarn.style.display = "block";
+          startScanBtn.disabled = true;
+          recentWrap.style.display = "none";
+          return;
+        }
+        selectedFile = file;
+        recentName.textContent = file.name;
+        recentSize.textContent = fmtSize(file.size);
+        recentWrap.style.display = "block";
+        startScanBtn.disabled = false;
+      }
+
+      startScanBtn.addEventListener("click", () => {
+        if (!selectedFile) return;
+        document.getElementById("fcName").textContent = selectedFile.name;
+        document.getElementById("fcMeta").textContent =
+          fmtSize(selectedFile.size) +
+          " · Diunggah " +
+          new Date().toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        document.getElementById("scanSubName").textContent = selectedFile.name;
+        showScreen("screen-scan");
+        runScan(selectedFile);
+      });
+
+      // ---------- Screen 2: Memindai ----------
+      const SCAN_STEPS = [
+        "Membaca berkas & menghitung hash SHA-256",
+        "Normalisasi byte dokumen",
+        "Analisis pola dengan model AI (LSTM)",
+        "Menyusun hasil",
+      ];
+      function renderScanSteps(activeIndex) {
+        const wrap = document.getElementById("scanSteps");
+        wrap.innerHTML = SCAN_STEPS.map((label, i) => {
+          let cls = "pending";
+          if (i < activeIndex) cls = "done";
+          else if (i === activeIndex) cls = "active";
+          return `<div class="scan-step ${cls}"><span class="icon"></span>${label}</div>`;
+        }).join("");
+      }
+
+      async function runScan(file) {
+        document.getElementById("scanErr").style.display = "none";
+        let step = 0;
+        renderScanSteps(step);
+        const stepTimer = setInterval(() => {
+          step = Math.min(step + 1, SCAN_STEPS.length - 1);
+          renderScanSteps(step);
+        }, 700);
+
+        const minWait = new Promise((res) =>
+          setTimeout(res, SCAN_STEPS.length * 700),
+        );
+        const sbClient = window.getSupabaseClient();
+        const {
+          data: { session },
+        } = await sbClient.auth.getSession();
+
+        if (!session) {
+          clearInterval(stepTimer);
+          const box = document.getElementById("scanErr");
+          box.textContent = "Sesi pengguna tidak valid. Silakan login.";
+          box.style.display = "block";
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("user_id", session.user.id);
+
+        let response,
+          data,
+          ok = true,
+          errMsg = "";
+        try {
+          const res = await fetch(API_URL, { method: "POST", body: formData });
+          data = await res.json();
+          if (!res.ok) {
+            ok = false;
+            errMsg = data.detail || "Terjadi kesalahan di server.";
+          } else response = data;
+        } catch (err) {
+          ok = false;
+          errMsg =
+            "Tidak dapat menghubungi server di " +
+            API_URL +
+            ". Pastikan FastAPI berjalan.";
+        }
+
+        await minWait;
+        clearInterval(stepTimer);
+
+        if (!ok) {
+          renderScanSteps(SCAN_STEPS.length);
+          const box = document.getElementById("scanErr");
+          box.textContent = errMsg;
+          box.style.display = "block";
+          return;
+        }
+
+        renderScanSteps(SCAN_STEPS.length);
+        apiResult = response;
+        setTimeout(() => goToHasil(), 350);
+      }
+
+      // ---------- Screen 3: Hasil ----------
+      function interpretResult(r) {
+        const status = r.status_verifikasi;
+        const rawScore = Number(r.akurasi_prediksi);
+        const isPalsu = status === "PALSU";
+        const isAsli = status === "ASLI";
+        const isAmbigu = status === "PERLU_REVIEW";
+        const pct = isAmbigu
+          ? 50
+          : Math.round((isPalsu ? rawScore : 1 - rawScore) * 100);
+        return { isAsli, isPalsu, isAmbigu, pct, rawScore };
+      }
+
+      function goToHasil() {
+        const { isAsli, isPalsu, isAmbigu, pct } = interpretResult(apiResult);
+        document.getElementById("hcName").textContent = apiResult.nama_file;
+        document.getElementById("hcMeta").textContent = fmtSize(
+          selectedFile.size,
+        );
+
+        const scoreEl = document.getElementById("resScorePct");
+        const labelEl = document.getElementById("resLabel");
+        scoreEl.textContent = pct + "%";
+        scoreEl.className =
+          "result-score " + (isAmbigu ? "neutral" : isAsli ? "good" : "bad");
+        labelEl.textContent = isAmbigu
+          ? "Ambigu / Tidak Yakin"
+          : isAsli
+            ? "Cenderung Asli"
+            : "Cenderung Palsu";
+        labelEl.className =
+          "result-label " + (isAmbigu ? "neutral" : isAsli ? "good" : "bad");
+        document.getElementById("resFileLine").textContent =
+          apiResult.nama_file + " · 1 sinyal diperiksa (model AI)";
+
+        showScreen("screen-hasil");
+      }
+
+      document
+        .getElementById("toReportBtn")
+        .addEventListener("click", goToLaporan);
+      document
+        .getElementById("backToUploadBtn")
+        .addEventListener("click", resetFlow);
+      document
+        .getElementById("backToUploadBtn2")
+        .addEventListener("click", resetFlow);
+      document
+        .getElementById("printBtn")
+        .addEventListener("click", () => window.print());
+
+      function resetFlow() {
+        selectedFile = null;
+        apiResult = null;
+        fileInput.value = "";
+        recentWrap.style.display = "none";
+        startScanBtn.disabled = true;
+        showScreen("screen-upload");
+      }
+
+      // ---------- Screen 4: Laporan ----------
+      function goToLaporan() {
+        const { isAsli, isAmbigu, pct } = interpretResult(apiResult);
+        const now = new Date();
+
+        document.getElementById("repNo").textContent =
+          "SHH-" + apiResult.hash_sha256.slice(0, 8).toUpperCase();
+        document.getElementById("repFileName").textContent =
+          apiResult.nama_file;
+        document.getElementById("repDate").textContent = now.toLocaleDateString(
+          "id-ID",
+          { day: "2-digit", month: "long", year: "numeric" },
+        );
+
+        document.getElementById("repSummary").textContent =
+          `${apiResult.nama_file} diperiksa menggunakan model AI (LSTM) yang menganalisis pola byte berkas. ` +
+          (isAmbigu
+            ? "Model berada tepat di ambang 50%, sehingga hasilnya ambigu dan perlu pemeriksaan lanjutan."
+            : isAsli
+              ? `Model menyimpulkan dokumen ini cenderung asli, dengan skor kepalsuan ${100 - pct}%.`
+              : `Model menyimpulkan dokumen ini cenderung palsu, dengan skor kepalsuan ${pct}%.`);
+
+        const conclusionBox = document.getElementById("repConclusion");
+        conclusionBox.className =
+          "conclusion " + (isAmbigu ? "neutral" : isAsli ? "good" : "bad");
+        document.getElementById("repConclusionPct").textContent = pct + "%";
+        document.getElementById("repConclusionLabel").textContent = isAmbigu
+          ? "Ambigu / Tidak Yakin"
+          : isAsli
+            ? "Cenderung Asli"
+            : "Cenderung Palsu";
+
+        document.getElementById("repFindingResult").textContent = isAmbigu
+          ? "Tidak cukup konklusif"
+          : isAsli
+            ? "Lebih dekat ke pola asli"
+            : "Lebih dekat ke pola palsu";
+        const levelEl = document.getElementById("repFindingLevel");
+        let levelClass = "lvl-rendah",
+          levelText = "Rendah";
+        if (isAmbigu) {
+          levelClass = "lvl-netral";
+          levelText = "Ambigu";
+        } else if (pct >= 80) {
+          levelClass = "lvl-tinggi";
+          levelText = "Tinggi";
+        } else if (pct >= 50) {
+          levelClass = "lvl-sedang";
+          levelText = "Sedang";
+        }
+        levelEl.className = "lvl " + levelClass;
+        levelEl.textContent = levelText;
+
+        document.getElementById("repRecommendation").textContent = isAsli
+          ? "Tidak ditemukan indikasi kuat kepalsuan pada berkas. Untuk kepastian penuh, konfirmasi tetap disarankan langsung ke penerbit resmi, karena model ini tidak memeriksa basis data penerbit maupun tanda tangan digital."
+          : isAmbigu
+            ? "Hasil berada tepat di ambang kebingungan. Lakukan verifikasi lanjutan ke penerbit resmi sebelum menarik kesimpulan."
+            : "Dokumen menunjukkan indikasi kuat kepalsuan dan tidak disarankan digunakan sebagai bukti keaslian tanpa konfirmasi lebih lanjut. Disarankan verifikasi langsung ke penerbit resmi dokumen.";
+
+        document.getElementById("repHash").textContent = apiResult.hash_sha256;
+
+        showScreen("screen-laporan");
+      }
+    </script>
+  </body>
+</html>

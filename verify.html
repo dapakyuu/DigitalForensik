@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atur Password Baru - Sahih</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="auth-page">
+    <main class="auth-layout signup-layout">
+      <section class="brand-panel">
+        <div class="brand-content">
+          <div class="brand-logo">S</div>
+          <h1>Sahih</h1>
+          <p>Selesaikan reset password akun Anda</p>
+        </div>
+      </section>
+
+      <section class="auth-panel">
+        <div class="auth-card signup-card fade-in-up">
+          <h2>Atur Password Baru</h2>
+          <p class="auth-note" id="otp-description">
+            Atur password baru untuk melanjutkan.
+          </p>
+
+          <form id="verify-form" class="auth-form" novalidate>
+            <button type="submit" class="primary-btn">
+              Simpan Password Baru
+            </button>
+
+            <div id="reset-password-fields" class="auth-form">
+              <label class="input-group">
+                <span class="input-icon" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                  </svg>
+                </span>
+                <input
+                  type="password"
+                  name="newPassword"
+                  placeholder="Password baru"
+                  minlength="8"
+                />
+              </label>
+
+              <label class="input-group">
+                <span class="input-icon" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                  </svg>
+                </span>
+                <input
+                  type="password"
+                  name="confirmNewPassword"
+                  placeholder="Konfirmasi password baru"
+                  minlength="8"
+                />
+              </label>
+            </div>
+
+            <div class="otp-actions">
+              <a href="login.html" class="text-link">Kembali ke login</a>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
