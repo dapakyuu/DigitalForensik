@@ -651,6 +651,23 @@ a {
   font-weight: 700;
 }
 
+.table-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(79, 70, 229, 0.08);
+  color: var(--indigo-600);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.table-action:hover {
+  background: rgba(79, 70, 229, 0.14);
+}
+
 .history-meta {
   display: block;
   margin-top: 4px;

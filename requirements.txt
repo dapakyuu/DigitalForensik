@@ -4,3 +4,4 @@ python-multipart
 tensorflow
 supabase
 python-dotenv
+pypdf

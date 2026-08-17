@@ -553,6 +553,41 @@
         padding: 11px 10px;
         border-bottom: 1px solid var(--line);
       }
+      table.meta-findings {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 22px;
+        font-size: 12.5px;
+      }
+      table.meta-findings th {
+        text-align: left;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ink-400);
+        border-bottom: 1px solid var(--line);
+        padding: 0 10px 8px;
+      }
+      table.meta-findings td {
+        padding: 10px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      .meta-key {
+        white-space: nowrap;
+        color: var(--ink-600);
+        width: 240px;
+      }
+      .meta-empty {
+        color: var(--ink-400);
+        font-style: italic;
+      }
+      .meta-desc {
+        margin-top: 4px;
+        font-size: 11px;
+        color: var(--ink-400);
+        line-height: 1.45;
+      }
       .lvl {
         font-size: 10.5px;
         font-weight: 700;
@@ -950,8 +985,9 @@
 
             <div class="disclaimer-box">
               Laporan ini dihasilkan otomatis dari satu model klasifikasi
-              berbasis pola byte berkas, tanpa pemeriksaan tanda tangan digital,
-              basis data PDDikti/Forlap, atau analisis metadata/font. Skor yang
+              berbasis pola byte berkas dan pembacaan metadata PDF dasar.
+              Pemeriksaan belum mencakup validasi sertifikat tanda tangan
+              digital maupun basis data resmi PDDikti/Forlap. Skor yang
               ditampilkan adalah skor kepalsuan: semakin tinggi angkanya,
               semakin kuat indikasi dokumen palsu. Hasil tetap bersifat
               indikatif dan <strong>bukan</strong> konfirmasi resmi dari
@@ -960,6 +996,22 @@
 
             <div class="sec-eyebrow">III · Rekomendasi</div>
             <div class="exec-summary" id="repRecommendation">–</div>
+
+            <div class="sec-eyebrow">IV · Metadata Dokumen</div>
+            <table class="meta-findings">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Nilai</th>
+                </tr>
+              </thead>
+              <tbody id="repMetaBody">
+                <tr>
+                  <td class="meta-key">Metadata</td>
+                  <td class="meta-empty">Belum tersedia</td>
+                </tr>
+              </tbody>
+            </table>
 
             <div class="report-foot">
               <div class="note">Dibuat otomatis oleh sistem Verifikasi</div>
@@ -977,8 +1029,8 @@
 
     <script>
       // ---------- Config ----------
-      // const API_URL = "http://127.0.0.1:8000/api/verify/";
-      const API_URL = "YOUR_NGROK_URL/api/verify/";
+      const API_URL = "http://127.0.0.1:8000/api/verify/";
+      // const API_URL = "https://deanne-unrecluse-seismologically.ngrok-free.dev/api/verify/";
       const MAX_SIZE_MB = 10;
 
       // ---------- State ----------
@@ -995,6 +1047,171 @@
       function fmtSize(bytes) {
         if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + " KB";
         return (bytes / 1024 / 1024).toFixed(1) + " MB";
+      }
+      function fmtMetaValue(value) {
+        if (value === null || value === undefined || value === "") return "-";
+        return String(value);
+      }
+      function formatPdfDate(value) {
+        if (value === null || value === undefined || value === "") return "-";
+
+        const raw = String(value).trim();
+        if (!raw) return "-";
+
+        const original = raw;
+
+        try {
+          let normalized = raw;
+          if (normalized.startsWith("D:")) normalized = normalized.slice(2);
+          normalized = normalized.replace(/'/g, "");
+
+          let match = normalized.match(/^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})(Z|[+-][0-9]{2})([0-9]{2})?$/);
+          if (match) {
+            const [, year, month, day, hour, minute, second, tzSign, tzHourMinute] = match;
+            const tzOffset = tzSign && tzHourMinute ? `${tzSign}${tzHourMinute.slice(0, 2)}:${tzHourMinute.slice(2, 4)}` : "";
+            const date = new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}${tzOffset}`);
+            if (!Number.isNaN(date.getTime())) {
+              return `${date.toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })} (${original})`;
+            }
+          }
+
+          const isoLike = normalized.replace(/Z$/, "+0000");
+          const date = new Date(isoLike);
+          if (!Number.isNaN(date.getTime())) {
+            return `${date.toLocaleDateString("id-ID", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })} (${original})`;
+          }
+        } catch (error) {
+          // fallback ke string asli
+        }
+
+        // return `${raw} (${original})`;
+        return `${original}`;
+      }
+      function fmtBool(value) {
+        if (value === null || value === undefined) return "-";
+        return value ? "Ya" : "Tidak";
+      }
+      function fmtPermissions(permissions) {
+        if (!permissions) return "-";
+
+        const enabled = [];
+        if (permissions.print) enabled.push("Print");
+        if (permissions.high_quality_print) enabled.push("High-Quality Print");
+        if (permissions.copy) enabled.push("Copy");
+        if (permissions.modify) enabled.push("Modify");
+        if (permissions.annotate) enabled.push("Annotate");
+        if (permissions.fill_forms) enabled.push("Fill Forms");
+        if (permissions.extract_for_accessibility)
+          enabled.push("Extract Accessibility");
+        if (permissions.assemble) enabled.push("Assemble");
+
+        return enabled.length ? enabled.join(", ") : "Tidak ada izin aktif";
+      }
+      function renderReportMetadata(meta) {
+        const metadata = meta || {};
+        const rows = [
+          {
+            key: "Title",
+            value: fmtMetaValue(metadata.title),
+            desc: "Judul dokumen yang tertanam di properti metadata PDF.",
+          },
+          {
+            key: "Author",
+            value: fmtMetaValue(metadata.author),
+            desc: "Nama penulis atau pemilik dokumen yang tercatat di metadata PDF.",
+          },
+          {
+            key: "Creator",
+            value: fmtMetaValue(metadata.creator),
+            desc: "Aplikasi asal yang membuat dokumen sebelum diekspor ke PDF.",
+          },
+          {
+            key: "Producer",
+            value: fmtMetaValue(metadata.producer),
+            desc: "Engine atau library yang menghasilkan file PDF final.",
+          },
+          {
+            key: "Creation Date",
+            value: formatPdfDate(metadata.creation_date),
+            desc: "Waktu pembuatan awal dokumen berdasarkan metadata internal.",
+          },
+          {
+            key: "Modification Date",
+            value: formatPdfDate(metadata.modification_date),
+            desc: "Waktu modifikasi terakhir dokumen menurut metadata PDF.",
+          },
+          {
+            key: "Page Count",
+            value: fmtMetaValue(metadata.page_count),
+            desc: "Jumlah halaman PDF yang terbaca saat analisis.",
+          },
+          {
+            key: "Encrypted",
+            value: fmtBool(metadata.is_encrypted),
+            desc: "Menunjukkan apakah file diproteksi enkripsi/password.",
+          },
+          {
+            key: "Signature Present",
+            value: fmtBool(metadata.signature_present),
+            desc: "Indikator keberadaan field tanda tangan digital pada dokumen.",
+          },
+          {
+            key: "XMP Present",
+            value: fmtBool(metadata.xmp_present),
+            desc: "Menunjukkan apakah metadata lanjutan XMP tersedia di PDF.",
+          },
+          {
+            key: "Linearized",
+            value: fmtBool(metadata.is_linearized),
+            desc: "Status optimasi Fast Web View agar PDF lebih cepat dibuka via web.",
+          },
+          {
+            key: "Revision Count",
+            value: fmtMetaValue(metadata.revision_count),
+            desc: "Perkiraan jumlah revisi incremental dari penanda startxref.",
+          },
+          {
+            key: "Has JavaScript",
+            value: fmtBool(metadata.has_javascript),
+            desc: "Indikator adanya JavaScript/action aktif yang bisa berjalan saat PDF dibuka.",
+          },
+          {
+            key: "Embedded Files Count",
+            value: fmtMetaValue(metadata.embedded_files_count),
+            desc: "Jumlah file lampiran yang disisipkan di dalam dokumen PDF.",
+          },
+          {
+            key: "Annotations Count",
+            value: fmtMetaValue(metadata.annotations_count),
+            desc: "Jumlah anotasi, komentar, atau markup yang ditemukan pada halaman.",
+          },
+          {
+            key: "Permissions (Decoded)",
+            value: fmtPermissions(metadata.permissions),
+            desc: "Daftar izin dokumen yang diaktifkan seperti print, copy, atau modify.",
+          },
+          {
+            key: "Permissions Raw",
+            value: fmtMetaValue(metadata.permissions_raw),
+            desc: "Nilai bitmask mentah izin PDF dari objek keamanan internal.",
+          },
+        ];
+
+        const body = document.getElementById("repMetaBody");
+        body.innerHTML = rows
+          .map(
+            (row) =>
+              `<tr><td class="meta-key">${row.key}</td><td><div>${row.value}</div><div class="meta-desc">${row.desc}</div></td></tr>`,
+          )
+          .join("");
       }
 
       // ---------- Screen 1: Upload ----------
@@ -1271,6 +1488,8 @@
           : isAmbigu
             ? "Hasil berada tepat di ambang kebingungan. Lakukan verifikasi lanjutan ke penerbit resmi sebelum menarik kesimpulan."
             : "Dokumen menunjukkan indikasi kuat kepalsuan dan tidak disarankan digunakan sebagai bukti keaslian tanpa konfirmasi lebih lanjut. Disarankan verifikasi langsung ke penerbit resmi dokumen.";
+
+        renderReportMetadata(apiResult.metadata);
 
         document.getElementById("repHash").textContent = apiResult.hash_sha256;
 
