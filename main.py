@@ -402,9 +402,6 @@ async def verify_document(file: UploadFile = File(...), user_id: str = Form(...)
         file_bytes = await file.read()
         file_hash = hashlib.sha256(file_bytes).hexdigest()
 
-        # mock_probability = 0.85
-        # status = "Indikasi Palsu" if mock_probability < 0.5 else "Indikasi Asli"
-
         byte_array = list(file_bytes)
         if len(byte_array) > MAX_LEN:
             half_len = MAX_LEN // 2
