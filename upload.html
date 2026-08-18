@@ -1203,6 +1203,21 @@
             value: fmtMetaValue(metadata.permissions_raw),
             desc: "Nilai bitmask mentah izin PDF dari objek keamanan internal.",
           },
+          {
+            key: "Scan / Digital",
+            value: fmtMetaValue(metadata.scan_or_digital),
+            desc: metadata.scan_detail || "Status PDF scan atau digital berdasarkan ekstraksi teks halaman.",
+          },
+          {
+            key: "Scan Confidence",
+            value: fmtMetaValue(metadata.scan_confidence),
+            desc: metadata.scan_impact_note || "Tingkat keyakinan dari klasifikasi scan/digital.",
+          },
+          {
+            key: "Scan Detail",
+            value: fmtMetaValue(metadata.scan_detail),
+            desc: "Informasi tambahan yang menjelaskan apakah dokumen kemungkinan hasil scan, digital, atau campuran.",
+          },
         ];
 
         const body = document.getElementById("repMetaBody");
@@ -1377,9 +1392,11 @@
         const isPalsu = status === "PALSU";
         const isAsli = status === "ASLI";
         const isAmbigu = status === "PERLU_REVIEW";
-        const pct = isAmbigu
-          ? 50
-          : Math.round((isPalsu ? rawScore : 1 - rawScore) * 100);
+
+        // Definisi konsisten di seluruh aplikasi:
+        // skor = peluang kepalsuan dokumen (0..1), bukan kebalikan dari skor asli.
+        const pct = isAmbigu ? 50 : Math.round(rawScore * 100);
+
         return { isAsli, isPalsu, isAmbigu, pct, rawScore };
       }
 
@@ -1444,13 +1461,17 @@
           { day: "2-digit", month: "long", year: "numeric" },
         );
 
+        const scanStatus = apiResult.scan_or_digital || apiResult.metadata?.scan_or_digital || "UNKNOWN";
+        const scanDetail = apiResult.scan_detail || apiResult.metadata?.scan_detail || "Status scan/digital tidak tersedia.";
+
         document.getElementById("repSummary").textContent =
           `${apiResult.nama_file} diperiksa menggunakan model AI (LSTM) yang menganalisis pola byte berkas. ` +
           (isAmbigu
-            ? "Model berada tepat di ambang 50%, sehingga hasilnya ambigu dan perlu pemeriksaan lanjutan."
+            ? "Model berada tepat di ambang 50%, sehingga hasilnya ambigu dan perlu pemeriksaan lanjutan. "
             : isAsli
-              ? `Model menyimpulkan dokumen ini cenderung asli, dengan skor kepalsuan ${100 - pct}%.`
-              : `Model menyimpulkan dokumen ini cenderung palsu, dengan skor kepalsuan ${pct}%.`);
+              ? `Model menyimpulkan dokumen ini cenderung asli, dengan skor kepalsuan ${pct}%. `
+              : `Model menyimpulkan dokumen ini cenderung palsu, dengan skor kepalsuan ${pct}%. `) +
+          `Informasi tambahan: PDF terdeteksi sebagai ${scanStatus}. ${scanDetail}`;
 
         const conclusionBox = document.getElementById("repConclusion");
         conclusionBox.className =

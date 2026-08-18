@@ -11,6 +11,7 @@ from pypdf.errors import PdfReadError
 from datetime import datetime
 import hashlib
 import os
+import fitz
 
 load_dotenv()
 app = FastAPI(title="Gateway Verifikasi Dokumen Akademik AI")
@@ -37,7 +38,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MODEL_PATH = "model_verifikasi_lstm.keras"
+MODEL_PATH = "best_model_pure_bilstm.keras"
 MAX_LEN = 10000
 
 if not os.path.exists(MODEL_PATH):
@@ -164,6 +165,61 @@ def _count_annotations(reader):
     return total
 
 
+def _detect_scan_or_digital(file_bytes: bytes):
+    result = {
+        "scan_or_digital": "UNKNOWN",
+        "scan_confidence": "low",
+        "scan_detail": "Tidak dapat menentukan apakah dokumen merupakan PDF murni atau hasil scan.",
+        "scan_impact_note": "Status scan/digital tidak dapat ditentukan secara pasti.",
+    }
+
+    try:
+        doc = fitz.open(stream=file_bytes, filetype="pdf")
+        total_pages = doc.page_count
+        if total_pages == 0:
+            return result
+
+        blank_pages = 0
+        text_pages = 0
+
+        for page in doc:
+            page_text = page.get_text("text") or ""
+            if page_text.strip():
+                text_pages += 1
+            else:
+                blank_pages += 1
+
+        if blank_pages == total_pages:
+            result["scan_or_digital"] = "SCAN"
+            result["scan_confidence"] = "medium"
+            result["scan_detail"] = "Semua halaman tidak memiliki teks yang bisa diekstraksi, kemungkinan besar dokumen merupakan hasil scan."
+            result["scan_impact_note"] = "Dokumen kemungkinan hasil scan. Kondisi ini dapat memengaruhi analisis karena teks mungkin berasal dari pemindaian atau OCR."
+            return result
+
+        if text_pages == total_pages:
+            result["scan_or_digital"] = "DIGITAL"
+            result["scan_confidence"] = "high"
+            result["scan_detail"] = "Semua halaman memiliki teks yang bisa diekstraksi, kemungkinan besar dokumen merupakan PDF digital murni."
+            result["scan_impact_note"] = "Dokumen kemungkinan PDF digital murni. Kondisi ini lebih ideal untuk analisis tekstual."
+            return result
+
+        if blank_pages > 0 and text_pages > 0:
+            result["scan_or_digital"] = "MIXED"
+            result["scan_confidence"] = "low"
+            result["scan_detail"] = "Ada campuran halaman berisi teks dan halaman kosong, kemungkinan kombinasi scan dan PDF digital."
+            result["scan_impact_note"] = "Dokumen campuran scan dan digital. Hasil analisis perlu ditafsirkan lebih hati-hati."
+            return result
+
+        return result
+    except Exception:
+        return result
+    finally:
+        try:
+            doc.close()
+        except Exception:
+            pass
+
+
 def extract_priority_metadata(file_bytes: bytes):
     metadata = {
         "title": None,
@@ -183,6 +239,10 @@ def extract_priority_metadata(file_bytes: bytes):
         "has_javascript": False,
         "embedded_files_count": None,
         "annotations_count": None,
+        "scan_or_digital": None,
+        "scan_confidence": None,
+        "scan_detail": None,
+        "scan_impact_note": None,
     }
 
     try:
@@ -222,6 +282,12 @@ def extract_priority_metadata(file_bytes: bytes):
                 field_ref.get_object().get("/FT") == "/Sig" for field_ref in fields
             )
             metadata["signature_present"] = bool(sig_flags) or has_signature_field
+
+        scan_metadata = _detect_scan_or_digital(file_bytes)
+        metadata["scan_or_digital"] = scan_metadata["scan_or_digital"]
+        metadata["scan_confidence"] = scan_metadata["scan_confidence"]
+        metadata["scan_detail"] = scan_metadata["scan_detail"]
+        metadata["scan_impact_note"] = scan_metadata["scan_impact_note"]
     except PdfReadError:
         # Metadata dibiarkan default jika PDF rusak atau tidak dapat dibaca penuh.
         return metadata
@@ -299,6 +365,9 @@ def _save_to_supabase(user_id: str, file_name: str, file_type: str, classificati
             "annotations_count": pdf_metadata.get("annotations_count"),
             "permissions": pdf_metadata.get("permissions"),
             "permissions_raw": pdf_metadata.get("permissions_raw"),
+            "scan_or_digital": pdf_metadata.get("scan_or_digital"),
+            "scan_confidence": pdf_metadata.get("scan_confidence"),
+            "scan_detail": pdf_metadata.get("scan_detail"),
         }
 
         metadata_result = supabase.table("document_metadata").insert(metadata_payload).execute()
@@ -348,6 +417,8 @@ async def verify_document(file: UploadFile = File(...), user_id: str = Form(...)
         input_data = pad_sequences([processed_bytes], maxlen=MAX_LEN, padding='pre', truncating='pre')
         prediction = model.predict(input_data)
 
+        # Skor model diperlakukan sebagai peluang kepalsuan dokumen.
+        # Nilai > 0.5 = cenderung palsu, < 0.5 = cenderung asli.
         probability_score = float(prediction[0][0])
 
         if probability_score > 0.5:
@@ -358,6 +429,9 @@ async def verify_document(file: UploadFile = File(...), user_id: str = Form(...)
             status = "PERLU_REVIEW"
 
         pdf_metadata = extract_priority_metadata(file_bytes)
+        scan_impact_note = pdf_metadata.get("scan_impact_note") or (
+            "Status scan/digital belum tersedia."
+        )
         db_record = _save_to_supabase(
             user_id=user_id,
             file_name=file.filename,
@@ -373,6 +447,10 @@ async def verify_document(file: UploadFile = File(...), user_id: str = Form(...)
             "status_verifikasi": status,
             "akurasi_prediksi": probability_score,
             "metadata": pdf_metadata,
+            "scan_or_digital": pdf_metadata.get("scan_or_digital"),
+            "scan_confidence": pdf_metadata.get("scan_confidence"),
+            "scan_detail": pdf_metadata.get("scan_detail"),
+            "scan_impact_note": scan_impact_note,
             "metadata_visibility": "login",
             "disimpan_ke_supabase": db_record is not None,
         }

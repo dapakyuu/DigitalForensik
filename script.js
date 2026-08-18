@@ -228,17 +228,33 @@
           ? formatDateOnly(row.created_at)
           : formatTimeOnly(row.created_at);
         const detailUrl = "detail.html?id=" + encodeURIComponent(row.id);
+        const scanStatus = row.scan_or_digital || "UNKNOWN";
+        const scanText =
+          scanStatus === "DIGITAL"
+            ? "Digital"
+            : scanStatus === "SCAN"
+              ? "Scan"
+              : scanStatus === "MIXED"
+                ? "Campuran"
+                : "Unknown";
 
         return [
           "<tr class='history-row-multiple-lines'>",
           "<td>" + row.file_name + "</td>",
           "<td>" + createdAt + "</td>",
           "<td>" + confidence + "</td>",
+          '<td><div style="font-weight:700; color:#111827;">' +
+            scanText +
+            '</div><div style="font-size:11px; color:#64748b; margin-top:2px;">' +
+            (row.scan_confidence ? row.scan_confidence.toUpperCase() : "-") +
+            "</div></td>",
           '<td><span class="badge ' +
             classification.badgeClass +
             '">' +
             classification.label +
-            "</span></td>",
+            '</span><div style="font-size:11px; color:#64748b; margin-top:6px;">' +
+            (row.scan_detail ? row.scan_detail : "Tidak ada info scan") +
+            "</div></td>",
           '<td><a class="table-action" href="' +
             detailUrl +
             '">Detail</a></td>',
@@ -317,6 +333,9 @@
           { key: "Embedded files", value: metadata.embedded_files_count ?? "-" },
           { key: "Annotations", value: metadata.annotations_count ?? "-" },
           { key: "Izin", value: metadata.permissions ? JSON.stringify(metadata.permissions) : "-" },
+          { key: "Scan / Digital", value: metadata.scan_or_digital || "-" },
+          { key: "Scan Confidence", value: metadata.scan_confidence || "-" },
+          { key: "Scan Detail", value: metadata.scan_detail || "-" },
         ]
       : [{ key: "Metadata", value: "Tidak tersedia" }];
 
@@ -351,6 +370,34 @@
       .select("id,file_name,persentase,ai_classification,created_at")
       .eq("user_id", session.user.id)
       .order("created_at", { ascending: false });
+
+    const historyIds = (data || []).map(function (row) {
+      return row.id;
+    });
+    const metadataMap = {};
+
+    if (historyIds.length > 0) {
+      const { data: metadataRows, error: metadataError } = await supabaseClient
+        .from("document_metadata")
+        .select("verification_id, scan_or_digital, scan_confidence, scan_detail")
+        .in("verification_id", historyIds);
+
+      if (!metadataError && metadataRows) {
+        metadataRows.forEach(function (meta) {
+          metadataMap[meta.verification_id] = meta;
+        });
+      }
+    }
+
+    const enrichedRows = (data || []).map(function (row) {
+      const meta = metadataMap[row.id] || {};
+      return {
+        ...row,
+        scan_or_digital: meta.scan_or_digital || null,
+        scan_confidence: meta.scan_confidence || null,
+        scan_detail: meta.scan_detail || null,
+      };
+    });
 
     if (error) {
       if (dashboardHistoryBody) {
@@ -399,13 +446,13 @@
     }
 
     if (dashboardHistoryBody) {
-      renderHistoryRows(dashboardHistoryBody, rows, {
+      renderHistoryRows(dashboardHistoryBody, enrichedRows, {
         showOnlyDate: false,
       });
     }
 
     if (historyTableBody) {
-      renderHistoryRows(historyTableBody, rows, {
+      renderHistoryRows(historyTableBody, enrichedRows, {
         showOnlyDate: true,
       });
     }
