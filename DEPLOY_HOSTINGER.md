@@ -4,6 +4,24 @@ Deployment menjalankan `frontend` (Nginx) pada port publik 8080 dan `api`
 (FastAPI serta TensorFlow) pada jaringan internal Docker. Website dapat dibuka
 melalui `http://187.52.122.64:8080`.
 
+## Deploy langsung dari Docker Manager
+
+Setelah seluruh perubahan terbaru sudah di-push ke branch `main` GitHub, buka
+Docker Manager > Compose > Compose from URL. Gunakan URL langsung berikut:
+
+```text
+https://raw.githubusercontent.com/dapakyuu/DigitalForensik/refs/heads/main/docker-compose.hostinger.yml
+```
+
+Compose khusus Hostinger menggunakan repository GitHub sebagai remote build
+context, sehingga Docker dapat mengambil Dockerfile, source, dan model yang
+dibutuhkan. Masukkan `SUPABASE_URL` dan `SUPABASE_SERVICE_ROLE_KEY` melalui
+pengaturan environment proyek Docker Manager. Jangan menuliskan service-role
+key di GitHub.
+
+URL halaman GitHub yang mengandung `/blob/` ditujukan untuk browser. Untuk
+Compose from URL, gunakan URL `raw.githubusercontent.com` di atas.
+
 ## 1. Siapkan source code di VPS
 
 Gunakan Browser Terminal Hostinger atau SSH:
