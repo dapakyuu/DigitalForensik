@@ -382,7 +382,7 @@ def _save_to_supabase(user_id: str, file_name: str, file_type: str, classificati
 
 
 @app.post("/api/verify/")
-async def verify_document(file: UploadFile = File(...), user_id: str = Form(...)):
+async def verify_document(file: UploadFile = File(...), user_id: str | None = Form(None)):
     file_name = (file.filename or "").strip()
     content_type = (file.content_type or "").lower()
 
@@ -391,9 +391,6 @@ async def verify_document(file: UploadFile = File(...), user_id: str = Form(...)
 
     if not file_name.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Kesalahan Ekstensi: Format file harus .pdf")
-
-    if not user_id or not user_id.strip():
-        raise HTTPException(status_code=400, detail="user_id wajib diisi.")
 
     if model is None:
         raise HTTPException(status_code=500, detail="Model verifikasi belum dimuat. Silakan periksa konfigurasi server.")
@@ -429,14 +426,17 @@ async def verify_document(file: UploadFile = File(...), user_id: str = Form(...)
         scan_impact_note = pdf_metadata.get("scan_impact_note") or (
             "Status scan/digital belum tersedia."
         )
-        db_record = _save_to_supabase(
-            user_id=user_id,
-            file_name=file.filename,
-            file_type=file.content_type or "application/pdf",
-            classification=status,
-            probability_score=probability_score,
-            pdf_metadata=pdf_metadata,
-        )
+        normalized_user_id = user_id.strip() if user_id else None
+        db_record = None
+        if normalized_user_id:
+            db_record = _save_to_supabase(
+                user_id=normalized_user_id,
+                file_name=file.filename,
+                file_type=file.content_type or "application/pdf",
+                classification=status,
+                probability_score=probability_score,
+                pdf_metadata=pdf_metadata,
+            )
 
         response_payload = {
             "nama_file": file.filename,
@@ -448,7 +448,7 @@ async def verify_document(file: UploadFile = File(...), user_id: str = Form(...)
             "scan_confidence": pdf_metadata.get("scan_confidence"),
             "scan_detail": pdf_metadata.get("scan_detail"),
             "scan_impact_note": scan_impact_note,
-            "metadata_visibility": "login",
+            "metadata_visibility": "account" if normalized_user_id else "public_session",
             "disimpan_ke_supabase": db_record is not None,
         }
 

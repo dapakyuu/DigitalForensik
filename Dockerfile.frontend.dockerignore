@@ -1,0 +1,12 @@
+.git
+.env*
+.venv
+__pycache__
+*.py
+*.pyc
+*.ipynb
+*.keras
+requirements.txt
+Dockerfile.api
+Dockerfile.frontend.dockerignore
+docker-compose.yml
