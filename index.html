@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Forensa - Memuat Aplikasi</title>
+    <meta
+      name="description"
+      content="Sahih membantu memverifikasi dokumen akademik PDF menggunakan analisis AI dan metadata digital."
+    />
+    <title>Sahih - Verifikasi Dokumen Akademik dengan AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -12,21 +16,234 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body class="splash-page">
-    <main class="splash-screen">
-      <div class="splash-logo">F</div>
-      <h1>Forensa</h1>
-      <p>Memverifikasi keaslian dokumen kamu</p>
-      <div class="splash-loader" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
+  <body class="landing-page">
+    <header class="landing-nav">
+      <a
+        class="landing-brand"
+        href="index.html"
+        aria-label="Sahih, halaman utama"
+        ><span class="mini-logo">S</span><span>Sahih</span></a
+      >
+      <nav class="landing-nav-links" aria-label="Navigasi utama">
+        <a href="#tentang">Tentang</a><a href="#coba">Coba Verifikasi</a
+        ><a class="landing-login-btn" href="login.html">Masuk</a>
+      </nav>
+    </header>
+    <main>
+      <section class="landing-hero" id="tentang">
+        <div class="hero-copy fade-in-up">
+          <span class="eyebrow">Verifikasi dokumen berbasis AI</span>
+          <h1>Periksa keaslian dokumen akademik dengan lebih mudah.</h1>
+          <p>
+            Sahih menganalisis pola digital, struktur PDF, dan metadata dokumen
+            untuk membantu mengidentifikasi indikasi keaslian atau manipulasi.
+          </p>
+          <div class="hero-actions">
+            <a class="landing-primary-btn" href="#coba">Coba Sekarang</a
+            ><a class="landing-secondary-btn" href="signup.html">Buat Akun</a>
+          </div>
+          <p class="hero-caption">
+            Tidak perlu login untuk percobaan pertama. Hanya file PDF, maksimum
+            10 MB.
+          </p>
+        </div>
+        <div
+          class="hero-visual"
+          aria-label="Ilustrasi proses verifikasi dokumen"
+        >
+          <div class="document-preview">
+            <div class="document-topline">
+              <span>PDF</span><span class="preview-status">AI CHECK</span>
+            </div>
+            <div class="preview-line wide"></div>
+            <div class="preview-line"></div>
+            <div class="preview-line short"></div>
+            <div class="preview-divider"></div>
+            <div class="preview-result">
+              <span class="preview-check">✓</span>
+              <div>
+                <strong>Analisis otomatis</strong
+                ><small>Metadata &amp; pola digital diperiksa</small>
+              </div>
+            </div>
+          </div>
+          <div class="floating-chip chip-ai">AI Analysis</div>
+          <div class="floating-chip chip-secure">SHA-256</div>
+        </div>
+      </section>
+      <section class="landing-benefits" aria-label="Fitur utama">
+        <article>
+          <span>01</span>
+          <h2>Analisis AI</h2>
+          <p>
+            Mendeteksi pola file yang mengindikasikan dokumen asli atau perlu
+            ditinjau.
+          </p>
+        </article>
+        <article>
+          <span>02</span>
+          <h2>Pemeriksaan Metadata</h2>
+          <p>
+            Menampilkan informasi teknis PDF untuk membantu proses verifikasi.
+          </p>
+        </article>
+        <article>
+          <span>03</span>
+          <h2>Hasil Ringkas</h2>
+          <p>
+            Status, skor prediksi, dan temuan penting disajikan dalam satu
+            tampilan.
+          </p>
+        </article>
+      </section>
+      <section class="public-check-section" id="coba">
+        <div class="section-heading">
+          <span class="eyebrow">Coba tanpa akun</span>
+          <h2>Verifikasi dokumen Anda</h2>
+          <p>
+            Unggah satu dokumen PDF. File percobaan publik tidak ditambahkan ke
+            riwayat akun.
+          </p>
+        </div>
+        <div class="public-upload-card" id="public-upload-card">
+          <div
+            class="public-dropzone"
+            id="public-dropzone"
+            tabindex="0"
+            role="button"
+            aria-controls="public-file-input"
+          >
+            <svg
+              width="42"
+              height="42"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              aria-hidden="true"
+            >
+              <path d="M12 16V4M12 4 7.5 8.5M12 4l4.5 4.5" />
+              <path d="M4 15.5V19a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3.5" />
+            </svg>
+            <h3>Tarik &amp; lepas PDF di sini</h3>
+            <p>atau pilih dokumen dari perangkat Anda</p>
+            <button
+              type="button"
+              class="landing-secondary-btn"
+              id="public-pick-btn"
+            >
+              Pilih File PDF</button
+            ><input
+              type="file"
+              id="public-file-input"
+              accept=".pdf,application/pdf"
+              hidden
+            />
+          </div>
+          <div class="public-file-row" id="public-file-row" hidden>
+            <div class="public-file-icon">PDF</div>
+            <div class="public-file-info">
+              <strong id="public-file-name">-</strong
+              ><span id="public-file-size">-</span>
+            </div>
+            <button
+              type="button"
+              class="public-remove-btn"
+              id="public-remove-btn"
+              aria-label="Hapus file"
+            >
+              ×
+            </button>
+          </div>
+          <p
+            class="public-upload-error"
+            id="public-upload-error"
+            role="alert"
+            hidden
+          ></p>
+          <button
+            type="button"
+            class="landing-primary-btn public-analyze-btn"
+            id="public-analyze-btn"
+            disabled
+          >
+            Mulai Analisis
+          </button>
+        </div>
+        <div
+          class="public-processing"
+          id="public-processing"
+          hidden
+          aria-live="polite"
+        >
+          <span class="public-spinner"></span>
+          <div>
+            <strong>Menganalisis dokumen...</strong>
+            <p>AI sedang membaca pola file dan metadata PDF.</p>
+          </div>
+        </div>
+        <section
+          class="public-result"
+          id="public-result"
+          hidden
+          aria-live="polite"
+        >
+          <div class="public-result-header">
+            <div class="detail-file-box">
+              <div class="detail-file-icon">PDF</div>
+              <div>
+                <h2 id="public-result-name">Hasil Analisis</h2>
+                <p id="public-result-meta">-</p>
+              </div>
+            </div>
+            <span class="detail-badge neutral" id="public-result-badge">-</span>
+          </div>
+          <div class="public-result-body">
+            <div class="public-result-stats">
+              <div>
+                <span>Status</span><strong id="public-result-status">-</strong>
+              </div>
+              <div>
+                <span>Keyakinan AI</span
+                ><strong id="public-result-confidence">-</strong>
+              </div>
+              <div>
+                <span>Tipe Dokumen</span
+                ><strong id="public-result-scan">-</strong>
+              </div>
+              <div>
+                <span>Jumlah Halaman</span
+                ><strong id="public-result-pages">-</strong>
+              </div>
+            </div>
+            <div class="public-result-summary" id="public-result-summary">
+              -
+            </div>
+            <h3>Detail Teknis Dokumen</h3>
+            <div class="public-metadata-grid" id="public-metadata-grid"></div>
+            <p class="public-disclaimer">
+              Hasil AI merupakan indikator awal, bukan keputusan forensik final.
+              Lakukan pemeriksaan lanjutan untuk kebutuhan resmi.
+            </p>
+            <div class="public-result-actions">
+              <button
+                type="button"
+                class="landing-secondary-btn"
+                id="public-reset-btn"
+              >
+                Analisis Dokumen Lain</button
+              ><a class="landing-primary-btn" href="signup.html"
+                >Daftar untuk Simpan Riwayat</a
+              >
+            </div>
+          </div>
+        </section>
+      </section>
     </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="supabase-config.js"></script>
-    <script src="script.js"></script>
+    <footer class="landing-footer">
+      <span><strong>Sahih</strong> · Verifikasi Keaslian Dokumen</span
+      ><a href="login.html">Masuk ke Dashboard</a>
+    </footer>
+    <script src="landing.js"></script>
   </body>
 </html>

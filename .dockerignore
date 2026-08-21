@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+.venv
+__pycache__
+*.py[cod]
+*.ipynb
+model_verifikasi_lstm-old.keras
+Dockerfile*
+docker-compose*.yml
+README*
