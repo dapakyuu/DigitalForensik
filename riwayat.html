@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Riwayat - Sahih</title>
+    <title>Riwayat - Forensa</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -11,14 +11,74 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Gaya Khusus untuk Tombol Cetak */
+      .btn-print {
+        background: #fff;
+        color: #4f46e5;
+        border: 1px solid #e6e8f0;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-print:hover {
+        background: #eef0fd;
+      }
+
+      /* Khusus Print: Menyembunyikan elemen UI yang tidak perlu */
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        
+        /* Hanya tampilkan area tabel riwayat */
+        .table-section, .table-section * {
+          visibility: visible;
+        }
+        
+        .table-section {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          border: none;
+          box-shadow: none;
+          margin: 0;
+          padding: 20px;
+        }
+        
+        /* Sembunyikan tombol cetak saat diprint */
+        .btn-print {
+          display: none !important;
+        }
+        
+        /* Hilangkan kolom AKSI (kolom terakhir) karena tidak berfungsi di kertas */
+        th:last-child, 
+        td:last-child {
+          display: none !important;
+        }
+
+        /* Penyesuaian agar tabel tidak terpotong */
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        tr {
+          page-break-inside: avoid;
+        }
+      }
+    </style>
   </head>
   <body class="dashboard-page">
     <div class="dashboard-layout">
       <aside class="sidebar">
         <div>
           <div class="sidebar-brand">
-            <div class="mini-logo">S</div>
-            <span>Sahih</span>
+            <div class="mini-logo">F</div>
+            <span>Forensa</span>
           </div>
 
           <nav class="sidebar-nav" id="sidebar-nav">
@@ -109,7 +169,7 @@
           <div>
             <h1>Riwayat Verifikasi</h1>
             <p>
-              Daftar semua dokumen yang pernah dianalisis oleh sistem Sahih.
+              Daftar semua dokumen yang pernah dianalisis oleh sistem VerifAI.
             </p>
           </div>
         </header>
@@ -118,11 +178,12 @@
           <div class="table-head">
             <h2>Semua Riwayat</h2>
             <button
-              id="download-report-btn"
+              id="btn-print-riwayat"
               type="button"
-              class="text-link link-button"
+              class="btn-print"
+              onclick="window.print()"
             >
-              Unduh laporan
+              Cetak Laporan
             </button>
           </div>
 
@@ -133,6 +194,7 @@
                   <th>DOKUMEN</th>
                   <th>TANGGAL</th>
                   <th>KEYAKINAN</th>
+                  <th>DIGITAL/SCAN</th>
                   <th>STATUS</th>
                   <th>AKSI</th>
                 </tr>

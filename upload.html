@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Upload Dokumen - Sahih</title>
+    <title>Upload Dokumen - Forensa</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -553,26 +553,52 @@
         padding: 11px 10px;
         border-bottom: 1px solid var(--line);
       }
-      table.meta-findings {
-        width: 100%;
-        border-collapse: collapse;
+
+      /* Styling Card Metadata*/
+      .report-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
         margin-bottom: 22px;
-        font-size: 12.5px;
       }
-      table.meta-findings th {
-        text-align: left;
-        font-size: 10px;
+
+      .report-meta-card {
+        background: var(--bg); /* atau var(--bg) untuk warna slightly abu-abu */
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px; /* Jarak vertikal antar elemen di dalam card */
+        transition: box-shadow 0.2s ease;
+      }
+
+      .report-meta-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      }
+
+      .report-meta-card .meta-card-key {
+        font-size: 10.5px;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.05em;
         color: var(--ink-400);
-        border-bottom: 1px solid var(--line);
-        padding: 0 10px 8px;
+        font-weight: 700;
       }
-      table.meta-findings td {
-        padding: 10px;
-        border-bottom: 1px solid var(--line);
-        vertical-align: top;
+
+      .report-meta-card .meta-card-value {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--ink-900);
+        word-break: break-word;
       }
+
+      .report-meta-card .meta-card-desc {
+        font-size: 11px;
+        color: var(--ink-600);
+        line-height: 1.45;
+        margin-top: auto; /* Mendorong deskripsi ke bawah jika tinggi card berbeda */
+      }
+
       .meta-key {
         white-space: nowrap;
         color: var(--ink-600);
@@ -658,6 +684,38 @@
         margin-top: 16px;
         display: none;
       }
+
+      /* Khusus Print: Menyembunyikan elemen UI saat dicetak */
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #reportRoot, #reportRoot * {
+          visibility: visible;
+        }
+        #reportRoot {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          border: none;
+          box-shadow: none;
+          padding: 0;
+          margin: 0;
+        }
+        /* Hilangkan elemen yang tidak perlu dari layout */
+        .sidebar, 
+        .dashboard-header, 
+        .top-actions, 
+        .page-head {
+          display: none !important;
+        }
+        /* Mencegah card metadata terpotong di tengah-tengah halaman saat diprint */
+        .report-meta-card {
+          page-break-inside: avoid;
+          break-inside: avoid;
+        }
+      }
     </style>
   </head>
   <body class="dashboard-page">
@@ -665,8 +723,8 @@
       <aside class="sidebar">
         <div>
           <div class="sidebar-brand">
-            <div class="mini-logo">S</div>
-            <span>Sahih</span>
+            <div class="mini-logo">F</div>
+            <span>Forensa</span>
           </div>
 
           <nav class="sidebar-nav" id="sidebar-nav">
@@ -917,7 +975,7 @@
           <div class="report" id="reportRoot">
             <div class="report-head">
               <div class="report-brand">
-                <div class="brand-mark">S</div>
+                <div class="brand-mark">V</div>
                 <div class="report-brand-text">
                   <div class="name">Verifikasi</div>
                   <div class="sub">Layanan Verifikasi Dokumen Akademik</div>
@@ -998,20 +1056,13 @@
             <div class="exec-summary" id="repRecommendation">–</div>
 
             <div class="sec-eyebrow">IV · Metadata Dokumen</div>
-            <table class="meta-findings">
-              <thead>
-                <tr>
-                  <th>Field</th>
-                  <th>Nilai</th>
-                </tr>
-              </thead>
-              <tbody id="repMetaBody">
-                <tr>
-                  <td class="meta-key">Metadata</td>
-                  <td class="meta-empty">Belum tersedia</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="report-meta-grid" id="repMetaGrid">
+              <div class="report-meta-card">
+                <div class="meta-card-key">Metadata</div>
+                <div class="meta-card-value">Belum tersedia</div>
+                <div class="meta-card-desc">-</div>
+              </div>
+            </div>
 
             <div class="report-foot">
               <div class="note">Dibuat otomatis oleh sistem Verifikasi</div>
@@ -1221,11 +1272,15 @@
           },
         ];
 
-        const body = document.getElementById("repMetaBody");
-        body.innerHTML = rows
+        const grid = document.getElementById("repMetaGrid");
+        grid.innerHTML = rows
           .map(
             (row) =>
-              `<tr><td class="meta-key">${row.key}</td><td><div>${row.value}</div><div class="meta-desc">${row.desc}</div></td></tr>`,
+              `<div class="report-meta-card">
+                <div class="meta-card-key">${row.key}</div>
+                <div class="meta-card-value">${row.value}</div>
+                <div class="meta-card-desc">${row.desc}</div>
+              </div>`
           )
           .join("");
       }
