@@ -317,38 +317,39 @@
 
     const rows = metadata && Object.keys(metadata).length
       ? [
-          { key: "Judul", value: metadata.title || "-" },
-          { key: "Author", value: metadata.author || metadata.creator || "-" },
-          { key: "Creator", value: metadata.creator || "-" },
-          { key: "Producer", value: metadata.producer || "-" },
-          { key: "Tanggal dibuat", value: formatPdfDate(metadata.creation_date) },
-          { key: "Tanggal diubah", value: formatPdfDate(metadata.modification_date) },
-          { key: "Jumlah halaman", value: metadata.page_count ?? "-" },
-          { key: "Terenkripsi", value: metadata.is_encrypted === true ? "Ya" : metadata.is_encrypted === false ? "Tidak" : "-" },
-          { key: "Ada tanda tangan", value: metadata.signature_present === true ? "Ya" : metadata.signature_present === false ? "Tidak" : "-" },
-          { key: "XMP", value: metadata.xmp_present === true ? "Ya" : metadata.xmp_present === false ? "Tidak" : "-" },
-          { key: "Linearized", value: metadata.is_linearized === true ? "Ya" : metadata.is_linearized === false ? "Tidak" : "-" },
-          { key: "Revisi", value: metadata.revision_count ?? "-" },
-          { key: "JavaScript", value: metadata.has_javascript === true ? "Ya" : metadata.has_javascript === false ? "Tidak" : "-" },
-          { key: "Embedded files", value: metadata.embedded_files_count ?? "-" },
-          { key: "Annotations", value: metadata.annotations_count ?? "-" },
-          { key: "Izin", value: metadata.permissions ? JSON.stringify(metadata.permissions) : "-" },
-          { key: "Scan / Digital", value: metadata.scan_or_digital || "-" },
-          { key: "Scan Confidence", value: metadata.scan_confidence || "-" },
-          { key: "Scan Detail", value: metadata.scan_detail || "-" },
+          { key: "Judul", value: metadata.title || "-", desc: "Judul dokumen yang tertanam di properti metadata PDF." },
+          { key: "Author", value: metadata.author || metadata.creator || "-", desc: "Nama penulis atau pemilik dokumen yang tercatat di metadata PDF." },
+          { key: "Creator", value: metadata.creator || "-", desc: "Aplikasi asal yang membuat dokumen sebelum diekspor ke PDF." },
+          { key: "Producer", value: metadata.producer || "-", desc: "Engine atau library yang menghasilkan file PDF final." },
+          { key: "Tanggal dibuat", value: formatPdfDate(metadata.creation_date), desc: "Waktu pembuatan awal dokumen berdasarkan metadata internal." },
+          { key: "Tanggal diubah", value: formatPdfDate(metadata.modification_date), desc: "Waktu modifikasi terakhir dokumen menurut metadata PDF." },
+          { key: "Jumlah halaman", value: metadata.page_count ?? "-", desc: "Jumlah halaman PDF yang terbaca saat analisis." },
+          { key: "Terenkripsi", value: metadata.is_encrypted === true ? "Ya" : metadata.is_encrypted === false ? "Tidak" : "-", desc: "Menunjukkan apakah file diproteksi enkripsi/password." },
+          { key: "Ada tanda tangan", value: metadata.signature_present === true ? "Ya" : metadata.signature_present === false ? "Tidak" : "-", desc: "Indikator keberadaan field tanda tangan digital pada dokumen." },
+          { key: "XMP", value: metadata.xmp_present === true ? "Ya" : metadata.xmp_present === false ? "Tidak" : "-", desc: "Menunjukkan apakah metadata lanjutan XMP tersedia di PDF." },
+          { key: "Linearized", value: metadata.is_linearized === true ? "Ya" : metadata.is_linearized === false ? "Tidak" : "-", desc: "Status optimasi Fast Web View agar PDF lebih cepat dibuka via web." },
+          { key: "Revisi", value: metadata.revision_count ?? "-", desc: "Perkiraan jumlah revisi incremental dari penanda startxref." },
+          { key: "JavaScript", value: metadata.has_javascript === true ? "Ya" : metadata.has_javascript === false ? "Tidak" : "-", desc: "Indikator adanya JavaScript/action aktif yang bisa berjalan saat PDF dibuka." },
+          { key: "Embedded files", value: metadata.embedded_files_count ?? "-", desc: "Jumlah file lampiran yang disisipkan di dalam dokumen PDF." },
+          { key: "Annotations", value: metadata.annotations_count ?? "-", desc: "Jumlah anotasi, komentar, atau markup yang ditemukan pada halaman." },
+          { key: "Izin", value: metadata.permissions ? JSON.stringify(metadata.permissions) : "-", desc: "Daftar izin dokumen yang diaktifkan seperti print, copy, atau modify." },
+          { key: "Scan / Digital", value: metadata.scan_or_digital || "-", desc: "Status PDF scan atau digital berdasarkan ekstraksi teks halaman." },
+          { key: "Scan Confidence", value: metadata.scan_confidence || "-", desc: "Tingkat keyakinan dari klasifikasi scan/digital." },
+          { key: "Scan Detail", value: metadata.scan_detail || "-", desc: "Informasi tambahan yang menjelaskan apakah dokumen kemungkinan hasil scan, digital, atau campuran." },
         ]
-      : [{ key: "Metadata", value: "Tidak tersedia" }];
+      : [{ key: "Metadata", value: "Tidak tersedia", desc: "Data metadata tidak ditemukan di database." }];
 
-    container.innerHTML = rows
-      .map(
-        (row) =>
-          '<div class="detail-meta-row"><span class="key">' +
-          row.key +
-          '</span><span class="value">' +
-          row.value +
-          "</span></div>",
-      )
-      .join("");
+      const grid = document.getElementById("detail-metadata");
+      grid.innerHTML = rows
+        .map(
+          (row) =>
+            `<div class="report-meta-card">
+              <div class="meta-card-key">${row.key}</div>
+              <div class="meta-card-value">${row.value}</div>
+              <div class="meta-card-desc">${row.desc || '-'}</div>
+            </div>`
+        )
+        .join("");
   }
 
   async function loadHistoryForSession(session) {
@@ -566,6 +567,7 @@
       data.persentase === null || data.persentase === undefined
         ? "-"
         : data.persentase + "%";
+    const sha256Hash = meta.sha256_hash || "-+";
 
     const titleEl = document.getElementById("detail-file-name");
     if (titleEl) titleEl.textContent = data.file_name || "Dokumen";
@@ -585,6 +587,9 @@
     const percentEl = document.getElementById("detail-percent");
     if (percentEl) percentEl.textContent = percentage;
 
+    const shaEl = document.getElementById("detail-hash");
+    if (shaEl) shaEl.textContent = sha256Hash;
+
     const statusEl = document.getElementById("detail-classification");
     if (statusEl) statusEl.textContent = classification.label;
 
@@ -601,10 +606,10 @@
         ".";
     }
 
-    const hashEl = document.getElementById("detail-hash");
-    if (hashEl) {
-      hashEl.textContent = "-";
-    }
+    // const hashEl = document.getElementById("detail-hash");
+    // if (hashEl) {
+    //   hashEl.textContent = "-";
+    // }
 
     renderMetadataRows(meta);
   }

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Detail Riwayat - Sahih</title>
+    <title>Detail Riwayat - Forensa</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -12,209 +12,278 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <style>
-      .detail-shell {
-        background: var(--bg-white);
-        border: 1px solid var(--line);
-        border-radius: 18px;
-        box-shadow: var(--shadow-soft);
-        overflow: hidden;
+      :root {
+        --indigo-600: #4f46e5;
+        --indigo-700: #4338ca;
+        --indigo-50: #eef0fd;
+        --ink-900: #1c2130;
+        --ink-600: #565e72;
+        --ink-400: #8b93a7;
+        --line: #e6e8f0;
+        --bg: #f4f5fa;
+        --card: #ffffff;
+        --red-600: #dc2626;
+        --red-50: #fdecec;
+        --green-600: #16a34a;
+        --green-50: #eaf7ee;
+        --amber-600: #b45309;
+        --amber-50: #fdf3e2;
+        --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
       }
 
-      .detail-header {
-        background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
-        border-bottom: 1px solid var(--line);
-        padding: 28px 32px;
-      }
-
-      .detail-header-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-        flex-wrap: wrap;
-      }
-
-      .detail-file-box {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-      }
-
-      .detail-file-icon {
-        width: 58px;
-        height: 58px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, var(--indigo-600), #818cf8);
-        color: #fff;
-        display: grid;
-        place-items: center;
-        font-size: 24px;
-        font-weight: 800;
-      }
-
-      .detail-file-name {
-        margin: 0;
-        font-size: 25px;
-        letter-spacing: -0.02em;
-      }
-
-      .detail-file-meta {
-        margin-top: 6px;
-        color: var(--text-muted);
-        font-size: 13px;
-      }
-
-      .detail-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 8px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-      }
-
-      .detail-badge.success {
-        background: rgba(22, 163, 74, 0.12);
-        color: var(--success);
-      }
-
-      .detail-badge.danger {
-        background: rgba(239, 68, 68, 0.12);
-        color: var(--danger);
-      }
-
-      .detail-badge.neutral {
-        background: rgba(100, 116, 139, 0.12);
-        color: var(--text-main);
-      }
-
-      .detail-body {
-        padding: 28px 32px 32px;
-      }
-
-      .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 18px;
-        margin-bottom: 28px;
-      }
-
-      .detail-stat {
-        background: #f8fafc;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 16px 18px;
-      }
-
-      .detail-stat .label {
-        display: block;
-        font-size: 11px;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: 8px;
-      }
-
-      .detail-stat .value {
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-      }
-
-      .detail-summary {
-        border: 1px solid var(--line);
-        background: #f8fafc;
-        border-radius: 12px;
-        padding: 18px 20px;
-        line-height: 1.7;
-        color: var(--text-main);
-        margin-bottom: 28px;
-      }
-
-      .detail-section-title {
-        margin: 0 0 16px;
-        font-size: 16px;
-        letter-spacing: -0.01em;
-      }
-
-      .detail-meta-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 12px;
-      }
-
-      .detail-meta-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 14px 16px;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: var(--bg-white);
-      }
-
-      .detail-meta-row .key {
-        color: var(--text-muted);
-        font-size: 12px;
-        font-weight: 600;
-      }
-
-      .detail-meta-row .value {
-        font-size: 13px;
-        text-align: right;
-        color: var(--text-main);
-        word-break: break-word;
-      }
-
-      .detail-actions {
+      /* Tombol Aksi Atas */
+      .top-actions {
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-        margin-top: 28px;
+        margin-bottom: 16px;
         flex-wrap: wrap;
       }
-
-      .primary-btn,
-      .secondary-btn {
+      .btn {
         border: none;
-        border-radius: 10px;
-        padding: 11px 18px;
-        font-size: 14px;
-        font-weight: 700;
+        border-radius: 8px;
+        padding: 9px 18px;
+        font-size: 13.5px;
+        font-weight: 600;
         cursor: pointer;
+        font-family: inherit;
+        transition: 0.2s ease;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
       }
-
-      .primary-btn {
+      .btn-primary {
         background: var(--indigo-600);
         color: #fff;
       }
-
-      .secondary-btn {
+      .btn-primary:hover {
+        background: var(--indigo-700);
+      }
+      .btn-ghost {
         background: #fff;
+        color: var(--indigo-700);
         border: 1px solid var(--line);
-        color: var(--text-main);
+      }
+      .btn-ghost:hover {
+        background: var(--indigo-50);
       }
 
-      @media (max-width: 640px) {
-        .detail-header,
-        .detail-body {
-          padding-left: 18px;
-          padding-right: 18px;
-        }
+      /* Gaya Laporan Utama (Sama seperti upload.html) */
+      .report {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 34px 36px;
+      }
+      .report-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-bottom: 18px;
+        border-bottom: 2px solid var(--indigo-600);
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      .report-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        color: #ffffff;
+        background: linear-gradient(135deg, var(--indigo-600), #818cf8);
+        font-weight: 800;
+      }
+      .report-brand-text .name {
+        font-weight: 800;
+        font-size: 15px;
+      }
+      .report-brand-text .sub {
+        font-size: 10px;
+        color: var(--ink-400);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .report-no {
+        text-align: right;
+        font-size: 10.5px;
+        color: var(--ink-400);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .report h2 {
+        font-size: 18px;
+        margin: 22px 0 16px;
+      }
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 18px;
+        margin-bottom: 24px;
+      }
+      .meta-grid .lbl {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--ink-400);
+        margin-bottom: 4px;
+      }
+      .meta-grid .val {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .sec-eyebrow {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--ink-400);
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .exec-summary {
+        font-size: 13.5px;
+        line-height: 1.6;
+        color: var(--ink-900);
+        margin-bottom: 16px;
+      }
+      .conclusion {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 18px;
+        border-radius: 10px;
+        margin-bottom: 26px;
+        background: var(--bg); /* Default fallback */
+      }
+      .conclusion .num {
+        font-size: 24px;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+      .conclusion .txt .k {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--ink-400);
+      }
+      .conclusion .txt .v {
+        font-weight: 700;
+        font-size: 14.5px;
+      }
+      
+      table.findings {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 22px;
+        font-size: 12.5px;
+      }
+      table.findings th {
+        text-align: left;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ink-400);
+        border-bottom: 1px solid var(--line);
+        padding: 0 10px 8px;
+      }
+      table.findings td {
+        padding: 11px 10px;
+        border-bottom: 1px solid var(--line);
+      }
 
-        .detail-meta-row {
-          flex-direction: column;
-          align-items: flex-start;
-        }
+      /* Metadata Card Styling */
+      .report-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-bottom: 22px;
+      }
 
-        .detail-meta-row .value {
-          text-align: left;
+      .report-meta-card {
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transition: box-shadow 0.2s ease;
+      }
+
+      .report-meta-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      }
+
+      .report-meta-card .meta-card-key {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--ink-400);
+        font-weight: 700;
+      }
+
+      .report-meta-card .meta-card-value {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--ink-900);
+        word-break: break-word;
+      }
+
+      .report-meta-card .meta-card-desc {
+        font-size: 11px;
+        color: var(--ink-600);
+        line-height: 1.45;
+        margin-top: auto;
+      }
+
+      .report-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-top: 1px dashed var(--line);
+        padding-top: 16px;
+        margin-top: 6px;
+        flex-wrap: wrap;
+      }
+      .report-foot .note {
+        font-size: 11px;
+        color: var(--ink-400);
+      }
+      .report-foot .hashline {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--ink-400);
+        text-align: right;
+      }
+
+      /* Khusus Print: Menyembunyikan sidebar dan navigasi saat dicetak */
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #reportRoot, #reportRoot * {
+          visibility: visible;
+        }
+        #reportRoot {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          border: none;
+          box-shadow: none;
+          padding: 0;
+        }
+        .sidebar, .dashboard-header, .top-actions {
+          display: none !important;
+        }
+        .report-meta-card {
+          page-break-inside: avoid;
+          break-inside: avoid;
         }
       }
     </style>
@@ -224,8 +293,8 @@
       <aside class="sidebar">
         <div>
           <div class="sidebar-brand">
-            <div class="mini-logo">S</div>
-            <span>Sahih</span>
+            <div class="mini-logo">V</div>
+            <span>Forensa</span>
           </div>
 
           <nav class="sidebar-nav" id="sidebar-nav">
@@ -294,53 +363,85 @@
           </div>
         </header>
 
-        <section class="detail-shell">
-          <div class="detail-header">
-            <div class="detail-header-top">
-              <div class="detail-file-box">
-                <div class="detail-file-icon">PDF</div>
-                <div>
-                  <h2 class="detail-file-name" id="detail-file-name">Memuat...</h2>
-                  <div class="detail-file-meta" id="detail-file-meta">Memuat data...</div>
-                </div>
+        <div class="top-actions">
+          <button class="btn btn-ghost" onclick="window.print()">Cetak / Simpan PDF</button>
+          <a class="btn btn-primary" href="riwayat.html">Kembali ke Riwayat</a>
+        </div>
+
+        <!-- ID yang digunakan dipertahankan agar script.js tetap bisa memasukkan datanya -->
+        <div class="report" id="reportRoot">
+          <div class="report-head">
+            <div class="report-brand">
+              <div class="brand-mark">V</div>
+              <div class="report-brand-text">
+                <div class="name">Verifikasi</div>
+                <div class="sub">Layanan Verifikasi Dokumen Akademik</div>
               </div>
-              <span class="detail-badge neutral" id="detail-status-badge">LOADING</span>
+            </div>
+            <div class="report-no">
+              Status Riwayat<br /><span style="color: var(--ink-900); font-family: var(--mono); font-size: 12px; font-weight:700;" id="detail-status-badge">MEMUAT...</span>
             </div>
           </div>
 
-          <div class="detail-body">
-            <div class="detail-grid">
-              <div class="detail-stat">
-                <span class="label">Status</span>
-                <div class="value" id="detail-classification">-</div>
-              </div>
-              <div class="detail-stat">
-                <span class="label">Persentase</span>
-                <div class="value" id="detail-percent">-</div>
-              </div>
-              <div class="detail-stat">
-                <span class="label">Tanggal</span>
-                <div class="value" id="detail-date">-</div>
-              </div>
-              <div class="detail-stat">
-                <span class="label">SHA-256</span>
-                <div class="value" id="detail-hash">-</div>
-              </div>
+          <h2>Laporan Hasil Pemeriksaan Dokumen</h2>
+          <div class="meta-grid">
+            <div>
+              <div class="lbl">Nama File</div>
+              <div class="val" id="detail-file-name">Memuat...</div>
             </div>
-
-            <div class="detail-summary" id="detail-summary">
-              Memuat ringkasan hasil analisis...
+            <div>
+              <div class="lbl">Tanggal Analisis</div>
+              <div class="val" id="detail-date">-</div>
             </div>
-
-            <h3 class="detail-section-title">Metadata Dokumen</h3>
-            <div class="detail-meta-grid" id="detail-metadata"></div>
-
-            <div class="detail-actions">
-              <a class="secondary-btn" href="riwayat.html">Kembali ke Riwayat</a>
-              <a class="primary-btn" href="upload.html">Analisis Dokumen Baru</a>
+            <div>
+              <div class="lbl">Jenis Dokumen</div>
+              <div class="val" id="detail-file-meta">PDF</div>
             </div>
           </div>
-        </section>
+
+          <div class="sec-eyebrow">I · Ringkasan Eksekutif</div>
+          <div class="exec-summary" id="detail-summary">Memuat ringkasan hasil analisis...</div>
+
+          <div class="conclusion" id="detail-conclusion-box">
+            <div class="num" id="detail-percent">-</div>
+            <div class="txt">
+              <div class="k">Kesimpulan Model</div>
+              <div class="v" id="detail-classification">-</div>
+            </div>
+          </div>
+
+          <div class="sec-eyebrow">II · Detail Pemeriksaan</div>
+          <table class="findings">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Metode</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Analisis pola byte dokumen — model AI (LSTM)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="sec-eyebrow">III · Metadata Dokumen</div>
+          <div class="report-meta-grid" id="detail-metadata">
+            <!-- Data Card Metadata akan disuntikkan ke sini oleh script.js -->
+            <div class="report-meta-card">
+              <div class="meta-card-key">Metadata</div>
+              <div class="meta-card-value">Sedang memuat...</div>
+              <div class="meta-card-desc">-</div>
+            </div>
+          </div>
+
+          <div class="report-foot">
+            <div class="note">Dibuat otomatis oleh sistem Verifikasi</div>
+            <div class="hashline">SHA-256 · <span id="detail-hash">-</span></div>
+          </div>
+        </div>
+
       </main>
     </div>
 

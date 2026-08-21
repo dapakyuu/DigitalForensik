@@ -368,6 +368,7 @@ def _save_to_supabase(user_id: str, file_name: str, file_type: str, classificati
             "scan_or_digital": pdf_metadata.get("scan_or_digital"),
             "scan_confidence": pdf_metadata.get("scan_confidence"),
             "scan_detail": pdf_metadata.get("scan_detail"),
+            "sha256_hash": hashlib.sha256(file_name.encode()).hexdigest(),
         }
 
         metadata_result = supabase.table("document_metadata").insert(metadata_payload).execute()
