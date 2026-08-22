@@ -73,12 +73,47 @@
     </style>
   </head>
   <body class="dashboard-page">
+    <div class="mobile-topbar">
+      <button
+        type="button"
+        class="hamburger-btn"
+        id="hamburger-btn"
+        aria-label="Buka menu navigasi"
+        aria-expanded="false"
+        aria-controls="sidebar"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 7h16" />
+          <path d="M4 12h16" />
+          <path d="M4 17h16" />
+        </svg>
+      </button>
+      <div class="sidebar-brand">
+        <div class="mini-logo">F</div>
+        <span>Forensa</span>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
     <div class="dashboard-layout">
-      <aside class="sidebar">
+      <aside class="sidebar" id="sidebar">
         <div>
-          <div class="sidebar-brand">
-            <div class="mini-logo">F</div>
-            <span>Forensa</span>
+          <div class="sidebar-top-row">
+            <div class="sidebar-brand">
+              <div class="mini-logo">F</div>
+              <span>Forensa</span>
+            </div>
+            <button
+              type="button"
+              class="sidebar-close-btn"
+              id="sidebar-close-btn"
+              aria-label="Tutup menu navigasi"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6 6 18" />
+                <path d="M6 6l12 12" />
+              </svg>
+            </button>
           </div>
 
           <nav class="sidebar-nav" id="sidebar-nav">

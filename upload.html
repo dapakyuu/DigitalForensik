@@ -685,6 +685,70 @@
         display: none;
       }
 
+      /* Responsif Mobile: komponen fitur utama ikut mengecil */
+      @media (max-width: 900px) {
+        .layout-with-file {
+          flex-direction: column;
+          gap: 16px;
+        }
+        .file-card {
+          width: 100%;
+        }
+        .panel {
+          min-width: 0;
+          width: 100%;
+          padding: 20px;
+        }
+        .report {
+          padding: 24px 20px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .page-head h1 {
+          font-size: 19px;
+        }
+        .dropzone {
+          padding: 34px 14px;
+        }
+        .result-score {
+          font-size: 32px;
+        }
+        .report {
+          padding: 18px 14px;
+        }
+        .report-head {
+          flex-direction: column;
+          gap: 10px;
+        }
+        .report-no {
+          text-align: left;
+        }
+        .meta-grid,
+        .report-meta-grid {
+          grid-template-columns: 1fr;
+        }
+        table.findings {
+          font-size: 11.5px;
+        }
+        table.findings th,
+        table.findings td {
+          padding: 8px 6px;
+        }
+        .btn-row {
+          flex-direction: column;
+        }
+        .btn-row .btn {
+          width: 100%;
+        }
+        .result-actions {
+          flex-direction: column;
+        }
+        .result-actions .btn {
+          width: 100%;
+        }
+      }
+
       /* Khusus Print: Menyembunyikan elemen UI saat dicetak */
       @media print {
         body * {
@@ -719,12 +783,47 @@
     </style>
   </head>
   <body class="dashboard-page">
+    <div class="mobile-topbar">
+      <button
+        type="button"
+        class="hamburger-btn"
+        id="hamburger-btn"
+        aria-label="Buka menu navigasi"
+        aria-expanded="false"
+        aria-controls="sidebar"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 7h16" />
+          <path d="M4 12h16" />
+          <path d="M4 17h16" />
+        </svg>
+      </button>
+      <div class="sidebar-brand">
+        <div class="mini-logo">F</div>
+        <span>Forensa</span>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
     <div class="dashboard-layout">
-      <aside class="sidebar">
+      <aside class="sidebar" id="sidebar">
         <div>
-          <div class="sidebar-brand">
-            <div class="mini-logo">F</div>
-            <span>Forensa</span>
+          <div class="sidebar-top-row">
+            <div class="sidebar-brand">
+              <div class="mini-logo">F</div>
+              <span>Forensa</span>
+            </div>
+            <button
+              type="button"
+              class="sidebar-close-btn"
+              id="sidebar-close-btn"
+              aria-label="Tutup menu navigasi"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6 6 18" />
+                <path d="M6 6l12 12" />
+              </svg>
+            </button>
           </div>
 
           <nav class="sidebar-nav" id="sidebar-nav">
