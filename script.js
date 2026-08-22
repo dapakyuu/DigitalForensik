@@ -32,6 +32,50 @@
       ? window.getSupabaseClient()
       : null;
 
+  // ---------- Sidebar mobile (hamburger) ----------
+  (function initMobileSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const hamburgerBtn = document.getElementById("hamburger-btn");
+    const closeBtn = document.getElementById("sidebar-close-btn");
+    const overlay = document.getElementById("sidebar-overlay");
+
+    if (!sidebar || !hamburgerBtn || !overlay) return;
+
+    function openSidebar() {
+      sidebar.classList.add("is-open");
+      overlay.classList.add("is-visible");
+      document.body.classList.add("sidebar-locked");
+      hamburgerBtn.setAttribute("aria-expanded", "true");
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove("is-open");
+      overlay.classList.remove("is-visible");
+      document.body.classList.remove("sidebar-locked");
+      hamburgerBtn.setAttribute("aria-expanded", "false");
+    }
+
+    hamburgerBtn.addEventListener("click", function () {
+      if (sidebar.classList.contains("is-open")) closeSidebar();
+      else openSidebar();
+    });
+
+    if (closeBtn) closeBtn.addEventListener("click", closeSidebar);
+    overlay.addEventListener("click", closeSidebar);
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeSidebar();
+    });
+
+    sidebar.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", closeSidebar);
+    });
+
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 980) closeSidebar();
+    });
+  })();
+
   async function showMessage(icon, title, text) {
     if (window.Swal) {
       await Swal.fire({
