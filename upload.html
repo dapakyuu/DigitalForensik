@@ -937,8 +937,7 @@
                 <div class="result-score" id="resScorePct">–</div>
                 <div class="result-label" id="resLabel">–</div>
                 <div class="result-file" id="resScoreNote">
-                  Skor di atas 50% berarti cenderung palsu, di bawah 50% berarti
-                  cenderung asli.
+                  Persentase menunjukkan tingkat keyakinan AI terhadap status dokumen tersebut (Asli/Palsu).
                 </div>
                 <div class="result-file" id="resFileLine">–</div>
                 <div class="result-actions">
@@ -1525,8 +1524,9 @@
           (isAmbigu
             ? "Model berada tepat di ambang 50%, sehingga hasilnya ambigu dan perlu pemeriksaan lanjutan. "
             : isAsli
-              ? `Model menyimpulkan dokumen ini cenderung asli, dengan skor kepalsuan ${pct}%. `
-              : `Model menyimpulkan dokumen ini cenderung palsu, dengan skor kepalsuan ${pct}%. `) +
+              // UBAH: dari "skor kepalsuan" menjadi "tingkat keyakinan"
+              ? `Model menyimpulkan dokumen ini cenderung asli, dengan tingkat keyakinan ${pct}%. `
+              : `Model menyimpulkan dokumen ini cenderung palsu, dengan tingkat keyakinan ${pct}%. `) +
           `Informasi tambahan: PDF terdeteksi sebagai ${scanStatus}. ${scanDetail}`;
 
         const conclusionBox = document.getElementById("repConclusion");
@@ -1545,18 +1545,17 @@
             ? "Lebih dekat ke pola asli"
             : "Lebih dekat ke pola palsu";
         const levelEl = document.getElementById("repFindingLevel");
-        let levelClass = "lvl-rendah",
-          levelText = "Rendah";
-        if (isAmbigu) {
-          levelClass = "lvl-netral";
-          levelText = "Ambigu";
-        } else if (pct >= 80) {
-          levelClass = "lvl-tinggi";
-          levelText = "Tinggi";
-        } else if (pct >= 50) {
-          levelClass = "lvl-sedang";
-          levelText = "Sedang";
+        let levelClass = "lvl-netral",
+            levelText = "Ambigu";
+            
+        if (isAsli) {
+          levelClass = "lvl-rendah"; // Hijau (Aman)
+          levelText = `Keyakinan ${pct >= 80 ? 'Tinggi' : 'Sedang'}`;
+        } else if (isPalsu) {
+          levelClass = "lvl-tinggi"; // Merah (Bahaya)
+          levelText = `Keyakinan ${pct >= 80 ? 'Tinggi' : 'Sedang'}`;
         }
+        
         levelEl.className = "lvl " + levelClass;
         levelEl.textContent = levelText;
 

@@ -325,18 +325,19 @@ def _normalize_pdf_datetime(value):
             return None
 
 
-def _save_to_supabase(user_id: str, file_name: str, file_type: str, classification: str, probability_score: float, pdf_metadata: dict):
+def _save_to_supabase(user_id: str, file_name: str, file_type: str, classification: str, confidence_score: float, raw_probability: float, pdf_metadata: dict):
     if supabase is None:
         return None
 
     try:
-        percentage = round(float(probability_score) * 100, 2)
+        # percentage = round(float(probability_score) * 100, 2)
         history_payload = {
             "user_id": user_id,
             "file_name": file_name,
             "file_type": file_type,
-            "persentase": percentage,
+            "persentase": round(confidence_score * 100, 2),
             "ai_classification": classification,
+            "raw_probability": float(raw_probability),
         }
 
         history_result = supabase.table("history").insert(history_payload).execute()
@@ -412,16 +413,17 @@ async def verify_document(file: UploadFile = File(...), user_id: str | None = Fo
         input_data = pad_sequences([processed_bytes], maxlen=MAX_LEN, padding='pre', truncating='pre')
         prediction = model.predict(input_data)
 
-        # Skor model diperlakukan sebagai peluang kepalsuan dokumen.
-        # Nilai > 0.5 = cenderung palsu, < 0.5 = cenderung asli.
         probability_score = float(prediction[0][0])
 
         if probability_score > 0.5:
             status = "PALSU"
+            confidence_score = probability_score
         elif probability_score < 0.5:
             status = "ASLI"
+            confidence_score = 1.0 - probability_score
         else:
             status = "PERLU_REVIEW"
+            confidence_score = 0.5
 
         pdf_metadata = extract_priority_metadata(file_bytes)
         scan_impact_note = pdf_metadata.get("scan_impact_note") or (
@@ -435,7 +437,8 @@ async def verify_document(file: UploadFile = File(...), user_id: str | None = Fo
                 file_name=file.filename,
                 file_type=file.content_type or "application/pdf",
                 classification=status,
-                probability_score=probability_score,
+                confidence_score=confidence_score,
+                raw_probability=probability_score,
                 pdf_metadata=pdf_metadata,
             )
 
@@ -443,7 +446,7 @@ async def verify_document(file: UploadFile = File(...), user_id: str | None = Fo
             "nama_file": file.filename,
             "hash_sha256": file_hash,
             "status_verifikasi": status,
-            "akurasi_prediksi": probability_score,
+            "akurasi_prediksi": confidence_score,
             "metadata": pdf_metadata,
             "scan_or_digital": pdf_metadata.get("scan_or_digital"),
             "scan_confidence": pdf_metadata.get("scan_confidence"),
