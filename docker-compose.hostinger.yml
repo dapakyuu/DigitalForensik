@@ -1,7 +1,7 @@
 services:
   api:
     build:
-      context: https://github.com/dapakyuu/DigitalForensik.git#main
+      context: https://github.com/dapakyuu/DigitalForensik.git#${DEPLOY_COMMIT:-main}
       dockerfile: Dockerfile.api
     restart: unless-stopped
     environment:
@@ -24,7 +24,7 @@ services:
 
   frontend:
     build:
-      context: https://github.com/dapakyuu/DigitalForensik.git#main
+      context: https://github.com/dapakyuu/DigitalForensik.git#${DEPLOY_COMMIT:-main}
       dockerfile: Dockerfile.frontend
     restart: unless-stopped
     depends_on:

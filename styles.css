@@ -690,6 +690,11 @@ a {
   overflow: hidden;
 }
 
+.brand-logo-transparent {
+  background: transparent;
+  box-shadow: none;
+}
+
 .brand-logo img,
 .mini-logo img {
   width: 135%;
