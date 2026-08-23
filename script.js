@@ -1,6 +1,13 @@
 (function () {
   const isSplash = document.body.classList.contains("splash-page");
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const initialAuthCallbackType = new URLSearchParams(
+    window.location.hash.replace(/^#/, ""),
+  ).get("type");
+
+  if (currentPage === "verify.html" && initialAuthCallbackType === "recovery") {
+    sessionStorage.setItem("forensa_recovery_flow", "true");
+  }
   const authPages = [
     "login.html",
     "signup.html",
@@ -120,11 +127,9 @@
     }
 
     const session = await getSession();
-    const authCallbackType = new URLSearchParams(
-      window.location.hash.replace(/^#/, ""),
-    ).get("type");
     const isRecoveryPage =
-      currentPage === "verify.html" && authCallbackType === "recovery";
+      currentPage === "verify.html" &&
+      sessionStorage.getItem("forensa_recovery_flow") === "true";
 
     if (protectedPages.includes(currentPage) && !session) {
       window.location.href = "login.html";
@@ -854,10 +859,8 @@
   if (verifyForm) {
     const recoveryDescription = document.getElementById("recovery-description");
     const submitButton = verifyForm.querySelector("button[type='submit']");
-    const hashParams = new URLSearchParams(
-      window.location.hash.replace(/^#/, ""),
-    );
-    const isRecoveryFlow = hashParams.get("type") === "recovery";
+    const isRecoveryFlow =
+      sessionStorage.getItem("forensa_recovery_flow") === "true";
 
     if (!isRecoveryFlow) {
       window.location.href = "login.html";
@@ -937,6 +940,8 @@
         "Password diperbarui",
         "Password baru berhasil disimpan. Silakan login kembali.",
       );
+      sessionStorage.removeItem("forensa_recovery_flow");
+      await supabaseClient.auth.signOut();
       window.location.href = "login.html";
     });
   }

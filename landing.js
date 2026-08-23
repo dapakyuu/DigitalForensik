@@ -3,8 +3,14 @@
     const hashParams = new URLSearchParams(
       window.location.hash.replace(/^#/, ""),
     );
+    const callbackType = hashParams.get("type");
 
-    if (hashParams.get("type") !== "signup") {
+    if (callbackType === "recovery") {
+      window.location.replace("verify.html" + window.location.hash);
+      return;
+    }
+
+    if (callbackType !== "signup") {
       return;
     }
 
