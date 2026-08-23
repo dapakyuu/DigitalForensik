@@ -687,6 +687,16 @@ a {
   color: var(--indigo-600);
   background: #ffffff;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+  overflow: hidden;
+}
+
+.brand-logo img,
+.mini-logo img {
+  width: 135%;
+  height: 135%;
+  max-width: none;
+  display: block;
+  object-fit: cover;
 }
 
 .brand-content h1 {
@@ -980,6 +990,7 @@ a {
   color: #ffffff;
   background: linear-gradient(135deg, var(--indigo-600), var(--indigo-500));
   font-weight: 800;
+  overflow: hidden;
 }
 
 .sidebar-nav {

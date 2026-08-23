@@ -79,6 +79,15 @@
         color: var(--indigo-600);
         font-size: 42px;
         font-weight: 800;
+        overflow: hidden;
+      }
+
+      .logo img {
+        width: 135%;
+        height: 135%;
+        max-width: none;
+        display: block;
+        object-fit: cover;
       }
 
       .code {
@@ -156,7 +165,7 @@
   </head>
   <body>
     <main class="error-card" aria-labelledby="error-title">
-      <div class="logo">F</div>
+      <div class="logo"><img src="assets/logo.png" alt="Logo Forensa" /></div>
       <p class="code">404</p>
       <h1 id="error-title">Halaman tidak ditemukan</h1>
       <p>

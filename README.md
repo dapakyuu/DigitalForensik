@@ -1,17 +1,17 @@
-# Sahih — Verifikasi Dokumen Pendidikan Berbasis Byte Stream
+# Forensa — Verifikasi Dokumen Pendidikan Berbasis Byte Stream
 
-Sahih adalah prototipe aplikasi web untuk membantu memeriksa keaslian dokumen
+Forensa adalah prototipe aplikasi web untuk membantu memeriksa keaslian dokumen
 pendidikan dalam format PDF. Sistem menggunakan model **Bidirectional Long
 Short-Term Memory (BiLSTM)** untuk mempelajari pola sekuensial pada byte
 stream dokumen dan mengklasifikasikannya sebagai dokumen asli atau dokumen yang
 terindikasi telah dimodifikasi.
 
-Selain prediksi model, Sahih menyajikan informasi forensik pendukung seperti
+Selain prediksi model, Forensa menyajikan informasi forensik pendukung seperti
 hash SHA-256, metadata PDF, riwayat revisi, status enkripsi, tanda tangan
 digital, permission, serta indikasi apakah dokumen merupakan PDF digital, hasil
 scan, atau campuran.
 
-> Sahih merupakan alat pemeriksaan awal. Hasil prediksi AI bukan keputusan
+> Forensa merupakan alat pemeriksaan awal. Hasil prediksi AI bukan keputusan
 > forensik final dan tetap perlu dikonfirmasi melalui pemeriksaan lanjutan.
 
 ## Latar Belakang
