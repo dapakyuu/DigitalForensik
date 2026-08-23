@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>404 - Halaman Tidak Ditemukan | Forensa</title>
-    <meta http-equiv="refresh" content="6; url=login.html" />
+    <meta http-equiv="refresh" content="6; url=/index.html" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -165,7 +165,9 @@
   </head>
   <body>
     <main class="error-card" aria-labelledby="error-title">
-      <div class="logo"><img src="assets/logo.png" alt="Logo Forensa" /></div>
+      <div class="logo">
+        <img src="/assets/logo_putih.png" alt="Logo Forensa" />
+      </div>
       <p class="code">404</p>
       <h1 id="error-title">Halaman tidak ditemukan</h1>
       <p>
@@ -173,13 +175,17 @@
         kembali ke halaman utama untuk melanjutkan.
       </p>
       <div class="actions">
-        <a class="btn btn-primary" href="login.html">Kembali ke Login</a>
-        <a class="btn btn-secondary" href="dashboard.html">Ke Dashboard</a>
+        <a class="btn btn-primary" href="/index.html"
+          >Kembali ke Landing Page</a
+        >
+        <a class="btn btn-secondary" href="/index.html#coba">Coba Verifikasi</a>
       </div>
       <div class="hint">
         Jika Anda membuka link lama, periksa kembali alamatnya.
       </div>
-      <div class="countdown">Anda akan dialihkan ke login dalam 6 detik.</div>
+      <div class="countdown">
+        Anda akan dialihkan ke landing page dalam 6 detik.
+      </div>
     </main>
   </body>
 </html>
