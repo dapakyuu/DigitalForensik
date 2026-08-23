@@ -57,21 +57,27 @@ mengubah jaringan Docker.
 ## 4. Pastikan Traefik tersedia
 
 Di **Docker Manager > Catalog**, deploy template Traefik resmi Hostinger jika
-belum ada. Setelah Traefik berjalan, buka Browser Terminal dan periksa jaringan:
+belum ada. Template yang digunakan pada VPS ini berjalan menggunakan
+`network_mode: host`, sehingga tidak membuat external network
+`traefik-proxy`. Kondisi tersebut normal.
+
+Periksa mode jaringan dengan:
 
 ```bash
-docker network ls
+docker inspect traefik-31jf-traefik-1 \
+  --format 'Network mode: {{.HostConfig.NetworkMode}}'
 ```
 
-Konfigurasi aplikasi mengharapkan external network bernama:
+Hasil yang diharapkan pada VPS ini:
 
 ```text
-traefik-proxy
+Network mode: host
 ```
 
-Jika template Hostinger membuat nama lain, samakan nilai `traefik-proxy` pada
-bagian `networks` dan label `traefik.docker.network` di
-`docker-compose.hostinger.yml` dengan nama jaringan tersebut.
+Karena Traefik menggunakan jaringan host, Compose Forensa tidak mendeklarasikan
+external network Traefik. Traefik membaca label Docker dan meneruskan request ke
+port internal container frontend. Jangan menambahkan `traefik-proxy` secara
+manual untuk konfigurasi ini.
 
 ## 5. Perbarui proyek yang sudah berjalan
 
@@ -199,4 +205,4 @@ Setelah langkah ini, akses publik hanya melalui HTTPS dan Traefik.
 Selama port 8080 masih dipertahankan, periksa versi aplikasi melalui
 `http://187.52.122.64:8080`. Jika container gagal dibangun, buka build log di
 Docker Manager, pastikan model `.keras` tersedia di GitHub, periksa environment
-variables, dan pastikan external network Traefik menggunakan nama yang benar.
+variables, dan periksa log Traefik serta frontend.
