@@ -661,13 +661,14 @@ a {
 }
 
 .brand-home-link .brand-logo {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .brand-home-link:hover .brand-logo,
 .brand-home-link:focus-visible .brand-logo {
   transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.22);
 }
 
 .brand-home-link:focus-visible {
@@ -676,32 +677,33 @@ a {
 }
 
 .brand-logo {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 16px;
-  border-radius: 16px;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 26px;
+  border-radius: 0;
   display: grid;
   place-items: center;
   font-size: 38px;
   font-weight: 800;
   color: var(--indigo-600);
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
-  overflow: hidden;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
 }
 
 .brand-logo-transparent {
   background: transparent;
   box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
 }
 
 .brand-logo img,
 .mini-logo img {
-  width: 135%;
-  height: 135%;
-  max-width: none;
+  width: 100%;
+  height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .brand-content h1 {
@@ -736,7 +738,9 @@ a {
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .back-home-link:hover {
@@ -989,13 +993,13 @@ a {
 .mini-logo {
   width: 38px;
   height: 38px;
-  border-radius: 11px;
+  border-radius: 0;
   display: grid;
   place-items: center;
   color: #ffffff;
-  background: linear-gradient(135deg, var(--indigo-600), var(--indigo-500));
+  background: transparent;
   font-weight: 800;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .sidebar-nav {
@@ -1474,7 +1478,7 @@ td {
     width: 30px;
     height: 30px;
     font-size: 14px;
-    border-radius: 9px;
+    border-radius: 0;
   }
 
   .sidebar {
