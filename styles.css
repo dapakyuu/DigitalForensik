@@ -677,9 +677,9 @@ a {
 }
 
 .brand-logo {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 26px;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 0px;
   border-radius: 0;
   display: grid;
   place-items: center;
