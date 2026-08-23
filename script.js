@@ -120,13 +120,18 @@
     }
 
     const session = await getSession();
+    const authCallbackType = new URLSearchParams(
+      window.location.hash.replace(/^#/, ""),
+    ).get("type");
+    const isRecoveryPage =
+      currentPage === "verify.html" && authCallbackType === "recovery";
 
     if (protectedPages.includes(currentPage) && !session) {
       window.location.href = "login.html";
       return null;
     }
 
-    if (authPages.includes(currentPage) && session) {
+    if (authPages.includes(currentPage) && session && !isRecoveryPage) {
       window.location.href = "dashboard.html";
       return null;
     }
@@ -772,6 +777,7 @@
         email: email,
         password: password,
         options: {
+          emailRedirectTo: buildAbsolutePath("login.html"),
           data: {
             full_name: fullName,
           },

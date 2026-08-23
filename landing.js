@@ -1,4 +1,39 @@
 (function () {
+  async function handleSignupCallback() {
+    const hashParams = new URLSearchParams(
+      window.location.hash.replace(/^#/, ""),
+    );
+
+    if (hashParams.get("type") !== "signup") {
+      return;
+    }
+
+    const supabaseClient = window.getSupabaseClient
+      ? window.getSupabaseClient()
+      : null;
+
+    if (!supabaseClient) {
+      console.error("Supabase belum siap untuk memproses konfirmasi akun.");
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error || !data.session) {
+      console.error(
+        "Session konfirmasi akun tidak dapat diproses.",
+        error || "Session tidak ditemukan.",
+      );
+      return;
+    }
+
+    // Token autentikasi tidak boleh dibiarkan terlihat di address bar.
+    window.history.replaceState({}, document.title, window.location.pathname);
+    window.location.replace("dashboard.html");
+  }
+
+  handleSignupCallback();
+
   const API_URL = "/api/verify/";
   // Development lokal (frontend dan backend berjalan di port berbeda):
   // const API_URL = "http://127.0.0.1:8000/api/verify/";
