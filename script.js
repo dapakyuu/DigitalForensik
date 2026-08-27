@@ -694,7 +694,10 @@
       return { label: "PALSU", badgeClass: "danger" };
     }
 
-    return { label: value || "PERLU REVIEW", badgeClass: "neutral" };
+    return {
+      label: value === "PERLU_REVIEW" ? "PERLU REVIEW" : value || "PERLU REVIEW",
+      badgeClass: "neutral",
+    };
   }
 
   function getHistoryDateSearchText(value) {
@@ -1267,9 +1270,9 @@
       .maybeSingle();
 
     if (error || !data) {
-      const statusBadge = document.getElementById("detail-status-badge");
-      if (statusBadge) {
-        statusBadge.textContent = "ERROR";
+      const referenceEl = document.getElementById("detail-reference");
+      if (referenceEl) {
+        referenceEl.textContent = "ERROR";
       }
       const summaryEl = document.getElementById("detail-summary");
       if (summaryEl) {
@@ -1288,25 +1291,24 @@
       ? {}
       : metadataRows[0];
     const classification = getClassificationLabel(data.ai_classification);
+    const confidenceValue = Number(data.persentase);
     const percentage =
       data.persentase === null || data.persentase === undefined
         ? "-"
         : data.persentase + "%";
-    const sha256Hash = meta.sha256_hash || "-+";
+    const sha256Hash = meta.sha256_hash || "-";
 
     const titleEl = document.getElementById("detail-file-name");
     if (titleEl) titleEl.textContent = data.file_name || "Dokumen";
 
     const metaEl = document.getElementById("detail-file-meta");
     if (metaEl) {
-      metaEl.textContent =
-        (data.file_type || "PDF") + " • " + formatLongDate(data.created_at);
+      metaEl.textContent = data.file_type || "PDF";
     }
 
-    const badgeEl = document.getElementById("detail-status-badge");
-    if (badgeEl) {
-      badgeEl.textContent = classification.label;
-      badgeEl.className = "detail-badge " + classification.badgeClass;
+    const referenceEl = document.getElementById("detail-reference");
+    if (referenceEl) {
+      referenceEl.textContent = "FOR-" + String(data.id).slice(0, 8).toUpperCase();
     }
 
     const percentEl = document.getElementById("detail-percent");
@@ -1317,6 +1319,42 @@
 
     const statusEl = document.getElementById("detail-classification");
     if (statusEl) statusEl.textContent = classification.label;
+
+    const conclusionBox = document.getElementById("detail-conclusion-box");
+    const conclusionClass =
+      classification.label === "ASLI"
+        ? "good"
+        : classification.label === "PALSU"
+          ? "bad"
+          : "neutral";
+    if (conclusionBox) {
+      conclusionBox.className = "conclusion " + conclusionClass;
+    }
+
+    const findingResult = document.getElementById("detail-finding-result");
+    if (findingResult) {
+      findingResult.textContent =
+        classification.label === "ASLI"
+          ? "Lebih dekat ke pola asli"
+          : classification.label === "PALSU"
+            ? "Lebih dekat ke pola palsu"
+            : "Tidak cukup konklusif";
+    }
+
+    const findingLevel = document.getElementById("detail-finding-level");
+    if (findingLevel) {
+      findingLevel.textContent =
+        classification.label === "PERLU REVIEW"
+          ? "Ambigu"
+          : "Keyakinan " + (confidenceValue >= 80 ? "Tinggi" : "Sedang");
+      findingLevel.className =
+        "lvl " +
+        (classification.label === "ASLI"
+          ? "lvl-rendah"
+          : classification.label === "PALSU"
+            ? "lvl-tinggi"
+            : "lvl-netral");
+    }
 
     const dateEl = document.getElementById("detail-date");
     if (dateEl) dateEl.textContent = formatLongDate(data.created_at);
@@ -1329,6 +1367,16 @@
         " menunjukkan bahwa dokumen ini memiliki indikator " +
         (classification.label === "ASLI" ? "kebersihan pola digital yang lebih tinggi" : "kemungkinan manipulasi atau pola tidak umum") +
         ".";
+    }
+
+    const recommendationEl = document.getElementById("detail-recommendation");
+    if (recommendationEl) {
+      recommendationEl.textContent =
+        classification.label === "ASLI"
+          ? "Pertahankan dokumen asli dan lakukan validasi kepada institusi penerbit apabila dokumen digunakan untuk proses resmi."
+          : classification.label === "PALSU"
+            ? "Lakukan pemeriksaan manual, bandingkan dengan dokumen sumber, dan konfirmasikan keabsahannya kepada institusi penerbit."
+            : "Ulangi analisis menggunakan berkas sumber berkualitas lebih baik dan lanjutkan dengan pemeriksaan manual oleh pihak berwenang.";
     }
 
     // const hashEl = document.getElementById("detail-hash");

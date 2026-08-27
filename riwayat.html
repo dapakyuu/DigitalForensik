@@ -243,17 +243,29 @@
           font-size: 10px;
         }
         .history-table th:nth-child(1),
-        .history-table td:nth-child(1) { width: 5%; }
+        .history-table td:nth-child(1) {
+          width: 5%;
+        }
         .history-table th:nth-child(2),
-        .history-table td:nth-child(2) { width: 34%; }
+        .history-table td:nth-child(2) {
+          width: 34%;
+        }
         .history-table th:nth-child(3),
-        .history-table td:nth-child(3) { width: 12%; }
+        .history-table td:nth-child(3) {
+          width: 12%;
+        }
         .history-table th:nth-child(4),
-        .history-table td:nth-child(4) { width: 10%; }
+        .history-table td:nth-child(4) {
+          width: 10%;
+        }
         .history-table th:nth-child(5),
-        .history-table td:nth-child(5) { width: 15%; }
+        .history-table td:nth-child(5) {
+          width: 15%;
+        }
         .history-table th:nth-child(6),
-        .history-table td:nth-child(6) { width: 24%; }
+        .history-table td:nth-child(6) {
+          width: 24%;
+        }
         thead {
           display: table-header-group;
         }
@@ -467,18 +479,14 @@
           <div class="table-head">
             <h2>Semua Riwayat</h2>
             <div class="report-actions">
-              <button
+              <!-- <button
                 id="btn-save-history-pdf"
                 type="button"
                 class="btn-print btn-save-pdf"
               >
                 Export PDF
-              </button>
-              <button
-                id="btn-print-riwayat"
-                type="button"
-                class="btn-print"
-              >
+              </button> -->
+              <button id="btn-print-riwayat" type="button" class="btn-print">
                 Cetak / Simpan Laporan
               </button>
             </div>
@@ -509,11 +517,51 @@
               <thead>
                 <tr>
                   <th>NO</th>
-                  <th><button type="button" class="table-sort-button" data-sort-key="file_name">DOKUMEN</button></th>
-                  <th><button type="button" class="table-sort-button" data-sort-key="created_at">TANGGAL</button></th>
-                  <th><button type="button" class="table-sort-button" data-sort-key="persentase">KEYAKINAN</button></th>
-                  <th><button type="button" class="table-sort-button" data-sort-key="scan_or_digital">DIGITAL/SCAN</button></th>
-                  <th><button type="button" class="table-sort-button" data-sort-key="ai_classification">STATUS</button></th>
+                  <th>
+                    <button
+                      type="button"
+                      class="table-sort-button"
+                      data-sort-key="file_name"
+                    >
+                      DOKUMEN
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      class="table-sort-button"
+                      data-sort-key="created_at"
+                    >
+                      TANGGAL
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      class="table-sort-button"
+                      data-sort-key="persentase"
+                    >
+                      KEYAKINAN
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      class="table-sort-button"
+                      data-sort-key="scan_or_digital"
+                    >
+                      DIGITAL/SCAN
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      class="table-sort-button"
+                      data-sort-key="ai_classification"
+                    >
+                      STATUS
+                    </button>
+                  </th>
                   <th>AKSI</th>
                 </tr>
               </thead>

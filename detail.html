@@ -175,11 +175,20 @@
         margin-bottom: 26px;
         background: var(--bg); /* Default fallback */
       }
+      .conclusion.bad { background: var(--red-50); }
+      .conclusion.good { background: var(--green-50); }
+      .conclusion.neutral { background: var(--bg); }
       .conclusion .num {
         font-size: 24px;
         font-weight: 800;
         flex-shrink: 0;
       }
+      .conclusion.bad .num,
+      .conclusion.bad .txt .v { color: var(--red-600); }
+      .conclusion.good .num,
+      .conclusion.good .txt .v { color: var(--green-600); }
+      .conclusion.neutral .num,
+      .conclusion.neutral .txt .v { color: var(--ink-600); }
       .conclusion .txt .k {
         font-size: 10px;
         text-transform: uppercase;
@@ -209,6 +218,28 @@
       table.findings td {
         padding: 11px 10px;
         border-bottom: 1px solid var(--line);
+      }
+
+      .lvl {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 20px;
+        font-size: 10.5px;
+        font-weight: 700;
+      }
+      .lvl-tinggi { background: var(--red-50); color: var(--red-600); }
+      .lvl-rendah { background: var(--green-50); color: var(--green-600); }
+      .lvl-netral { background: var(--bg); color: var(--ink-600); }
+
+      .disclaimer-box {
+        margin-bottom: 22px;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--ink-600);
+        font-size: 12px;
+        line-height: 1.55;
       }
 
       /* Metadata Card Styling */
@@ -547,7 +578,7 @@
               </div>
             </div>
             <div class="report-no">
-              <span style="padding-bottom: 12px">Status Riwayat</span
+              <span style="padding-bottom: 12px">No. Referensi</span
               ><br /><span
                 style="
                   margin-top: 20px;
@@ -556,7 +587,7 @@
                   font-size: 12px;
                   font-weight: 700;
                 "
-                id="detail-status-badge"
+                id="detail-reference"
                 >MEMUAT...</span
               >
             </div>
@@ -597,17 +628,32 @@
               <tr>
                 <th>#</th>
                 <th>Metode</th>
+                <th>Hasil</th>
+                <th>Skor</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>1</td>
                 <td>Analisis pola byte dokumen — model AI (LSTM)</td>
+                <td id="detail-finding-result">-</td>
+                <td><span class="lvl" id="detail-finding-level">-</span></td>
               </tr>
             </tbody>
           </table>
 
-          <div class="sec-eyebrow">III · Metadata Dokumen</div>
+          <div class="disclaimer-box">
+            Laporan ini dihasilkan otomatis dari model klasifikasi berbasis
+            pola byte berkas dan pembacaan metadata PDF dasar. Pemeriksaan
+            belum mencakup validasi sertifikat tanda tangan digital maupun
+            basis data resmi PDDikti/Forlap. Hasil bersifat indikatif dan
+            <strong>bukan</strong> konfirmasi resmi dari institusi penerbit.
+          </div>
+
+          <div class="sec-eyebrow">III · Rekomendasi</div>
+          <div class="exec-summary" id="detail-recommendation">-</div>
+
+          <div class="sec-eyebrow">IV · Metadata Dokumen</div>
           <div class="report-meta-grid" id="detail-metadata">
             <!-- Data Card Metadata akan disuntikkan ke sini oleh script.js -->
             <div class="report-meta-card">
