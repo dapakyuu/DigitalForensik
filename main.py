@@ -410,7 +410,7 @@ async def verify_document(file: UploadFile = File(...), user_id: str | None = Fo
         else:
             processed_bytes = byte_array
 
-        input_data = pad_sequences([processed_bytes], maxlen=MAX_LEN, padding='pre', truncating='pre')
+        input_data = pad_sequences([processed_bytes], maxlen=MAX_LEN, padding='post', truncating='pre')
         prediction = model.predict(input_data)
 
         probability_score = float(prediction[0][0])
