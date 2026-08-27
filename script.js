@@ -348,6 +348,19 @@
         4: { cellWidth: 44 },
         5: { cellWidth: "auto" },
       },
+      didParseCell: function (data) {
+        if (
+          data.section === "body" &&
+          data.row.index === rows.length - 1
+        ) {
+          data.cell.styles.lineWidth = {
+            top: 0.2,
+            right: 0.2,
+            bottom: 0,
+            left: 0.2,
+          };
+        }
+      },
       didDrawPage: function (data) {
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
