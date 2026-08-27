@@ -43,7 +43,6 @@
     "history-pagination-info",
   );
   const historyPrintDate = document.getElementById("history-print-date");
-  const historyPrintPages = document.getElementById("history-print-pages");
   let historyRowsCache = [];
   let historyCurrentPage = 1;
   let historyPageSize = 10;
@@ -66,7 +65,20 @@
   updateHistoryPrintDate();
   window.addEventListener("beforeprint", function () {
     updateHistoryPrintDate();
-    buildHistoryPrintPages();
+
+    if (historyTableBody) {
+      renderHistoryRows(historyTableBody, getFilteredHistoryRows(), {
+        showOnlyDate: true,
+        allowDelete: false,
+        showRowNumber: true,
+        rowNumberStart: 0,
+      });
+    }
+  });
+  window.addEventListener("afterprint", function () {
+    if (historyTableBody) {
+      renderHistoryPagination();
+    }
   });
   const nav = document.getElementById("sidebar-nav");
   const logoutBtn = document.getElementById("logout-btn");
@@ -264,90 +276,6 @@
         return String(value || "").toLowerCase().includes(query);
       });
     });
-  }
-
-  function buildHistoryPrintPages() {
-    if (!historyPrintPages) {
-      return;
-    }
-
-    const rows = getFilteredHistoryRows();
-    const rowsPerPage = 15;
-    const pageCount = Math.max(1, Math.ceil(rows.length / rowsPerPage));
-    const printedAt = new Date().toLocaleString("id-ID", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    const pages = [];
-
-    for (let pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
-      const startIndex = pageIndex * rowsPerPage;
-      const pageRows = rows.slice(startIndex, startIndex + rowsPerPage);
-      const bodyHtml = pageRows.length
-        ? pageRows
-            .map(function (row, rowIndex) {
-              const classification = getClassificationLabel(
-                row.ai_classification,
-              );
-              const scanStatus = (row.scan_or_digital || "UNKNOWN").toUpperCase();
-              const confidence =
-                row.persentase === null || row.persentase === undefined
-                  ? "-"
-                  : row.persentase + "%";
-
-              return [
-                '<tr class="history-row-multiple-lines">',
-                "<td>" + (startIndex + rowIndex + 1) + "</td>",
-                "<td>" + escapeHtml(row.file_name || "-") + "</td>",
-                "<td>" + escapeHtml(formatDateOnly(row.created_at)) + "</td>",
-                "<td>" + escapeHtml(confidence) + "</td>",
-                "<td><strong>" +
-                  escapeHtml(scanStatus) +
-                  "</strong><div>" +
-                  escapeHtml(row.scan_confidence || "-") +
-                  "</div></td>",
-                '<td><span class="badge ' +
-                  classification.badgeClass +
-                  '">' +
-                  escapeHtml(classification.label) +
-                  "</span><div>" +
-                  escapeHtml(row.scan_detail || "Tidak ada info scan") +
-                  "</div></td>",
-                "</tr>",
-              ].join("");
-            })
-            .join("")
-        : '<tr><td colspan="6" class="table-empty">Belum ada riwayat yang sesuai.</td></tr>';
-
-      pages.push(
-        [
-          '<section class="history-print-page">',
-          '<div class="history-print-header">',
-          '<div class="history-print-brand">',
-          '<img class="history-print-logo" src="assets/logo.png" alt="Logo Forensa" />',
-          "<div><strong>Forensa</strong><span>Layanan Verifikasi Dokumen Akademik</span></div>",
-          "</div>",
-          '<div class="history-print-date"><span>Tanggal Cetak</span><strong>' +
-            escapeHtml(printedAt) +
-            "</strong><span>Halaman " +
-            (pageIndex + 1) +
-            " dari " +
-            pageCount +
-            "</span></div>",
-          "</div>",
-          '<div class="table-head"><h2>Semua Riwayat</h2></div>',
-          '<div class="table-wrap"><table class="history-table">',
-          "<thead><tr><th>NO</th><th>DOKUMEN</th><th>TANGGAL</th><th>KEYAKINAN</th><th>DIGITAL/SCAN</th><th>STATUS</th></tr></thead>",
-          "<tbody>" + bodyHtml + "</tbody></table></div>",
-          "</section>",
-        ].join(""),
-      );
-    }
-
-    historyPrintPages.innerHTML = pages.join("");
   }
 
   async function loadImageDataUrl(path) {
@@ -1580,7 +1508,6 @@
 
   if (printHistoryBtn) {
     printHistoryBtn.addEventListener("click", function () {
-      buildHistoryPrintPages();
       window.print();
     });
   }

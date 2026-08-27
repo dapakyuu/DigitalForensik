@@ -67,10 +67,6 @@
         border-bottom: 2px solid #4f46e5;
       }
 
-      .history-print-pages {
-        display: none;
-      }
-
       .history-print-brand {
         display: flex;
         align-items: center;
@@ -145,66 +141,16 @@
         }
 
         .table-section {
-          display: none !important;
-        }
-
-        .history-print-pages {
-          display: block !important;
-        }
-
-        .history-print-page {
+          position: static;
           width: 100%;
           box-sizing: border-box;
-          overflow: hidden;
+          overflow: visible;
           border: 1px solid #dbe2ea;
           border-radius: 14px;
           background: #fff;
           box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
-          break-after: page;
-          page-break-after: always;
-        }
-
-        .history-print-page:last-child {
-          break-after: auto;
-          page-break-after: auto;
-        }
-
-        .history-print-page .history-print-header {
-          display: flex;
-        }
-
-        .history-print-page .history-table {
-          table-layout: fixed;
-        }
-
-        .history-print-page .history-table th:nth-child(1),
-        .history-print-page .history-table td:nth-child(1) {
-          width: 5%;
-        }
-
-        .history-print-page .history-table th:nth-child(2),
-        .history-print-page .history-table td:nth-child(2) {
-          width: 34%;
-        }
-
-        .history-print-page .history-table th:nth-child(3),
-        .history-print-page .history-table td:nth-child(3) {
-          width: 12%;
-        }
-
-        .history-print-page .history-table th:nth-child(4),
-        .history-print-page .history-table td:nth-child(4) {
-          width: 10%;
-        }
-
-        .history-print-page .history-table th:nth-child(5),
-        .history-print-page .history-table td:nth-child(5) {
-          width: 15%;
-        }
-
-        .history-print-page .history-table th:nth-child(6),
-        .history-print-page .history-table td:nth-child(6) {
-          width: 24%;
+          margin: 0;
+          padding: 0;
         }
 
         .table-head {
@@ -288,9 +234,27 @@
         /* Penyesuaian agar tabel tidak terpotong */
         table {
           width: 100%;
-          border-collapse: separate;
-          border-spacing: 0;
+          border-collapse: collapse;
+          table-layout: fixed;
           font-size: 10px;
+        }
+        .history-table th:nth-child(1),
+        .history-table td:nth-child(1) { width: 5%; }
+        .history-table th:nth-child(2),
+        .history-table td:nth-child(2) { width: 34%; }
+        .history-table th:nth-child(3),
+        .history-table td:nth-child(3) { width: 12%; }
+        .history-table th:nth-child(4),
+        .history-table td:nth-child(4) { width: 10%; }
+        .history-table th:nth-child(5),
+        .history-table td:nth-child(5) { width: 15%; }
+        .history-table th:nth-child(6),
+        .history-table td:nth-child(6) { width: 24%; }
+        thead {
+          display: table-header-group;
+        }
+        tbody {
+          display: table-row-group;
         }
         th,
         td {
@@ -317,6 +281,7 @@
         }
         tr {
           page-break-inside: avoid;
+          break-inside: avoid;
         }
         tbody tr:last-child td { border-bottom: 0 !important; }
       }
@@ -558,11 +523,6 @@
             ></nav>
           </div>
         </section>
-        <div
-          id="history-print-pages"
-          class="history-print-pages"
-          aria-hidden="true"
-        ></div>
       </main>
     </div>
 
