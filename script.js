@@ -317,6 +317,41 @@
     return { label: value || "PERLU REVIEW", badgeClass: "neutral" };
   }
 
+  function getHistoryDateSearchText(value) {
+    if (!value) {
+      return "";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return String(value);
+    }
+
+    return [
+      String(value),
+      date.toISOString().slice(0, 10),
+      date.toLocaleDateString("id-ID"),
+      date.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
+      date.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }),
+      date.toLocaleDateString("id-ID", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }),
+    ]
+      .join(" ")
+      .toLowerCase();
+  }
+
   function escapeHtml(value) {
     const element = document.createElement("div");
     element.textContent = value === null || value === undefined ? "" : String(value);
@@ -406,6 +441,7 @@
         row.ai_classification,
         row.scan_or_digital,
         row.scan_detail,
+        getHistoryDateSearchText(row.created_at),
       ].some(function (value) {
         return String(value || "").toLowerCase().includes(query);
       });
