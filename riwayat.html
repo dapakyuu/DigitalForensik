@@ -67,6 +67,10 @@
         border-bottom: 2px solid #4f46e5;
       }
 
+      .history-print-pages {
+        display: none;
+      }
+
       .history-print-brand {
         display: flex;
         align-items: center;
@@ -141,7 +145,14 @@
         }
 
         .table-section {
-          position: static;
+          display: none !important;
+        }
+
+        .history-print-pages {
+          display: block !important;
+        }
+
+        .history-print-page {
           width: 100%;
           box-sizing: border-box;
           overflow: hidden;
@@ -149,10 +160,17 @@
           border-radius: 14px;
           background: #fff;
           box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
-          margin: 0;
-          padding: 0;
-          break-after: avoid-page;
-          page-break-after: avoid;
+          break-after: page;
+          page-break-after: always;
+        }
+
+        .history-print-page:last-child {
+          break-after: auto;
+          page-break-after: auto;
+        }
+
+        .history-print-page .history-print-header {
+          display: flex;
         }
 
         .table-head {
@@ -228,8 +246,8 @@
         }
 
         /* Hilangkan kolom AKSI (kolom terakhir) karena tidak berfungsi di kertas */
-        th:last-child,
-        td:last-child {
+        .table-section th:last-child,
+        .table-section td:last-child {
           display: none !important;
         }
 
@@ -449,7 +467,6 @@
                 id="btn-print-riwayat"
                 type="button"
                 class="btn-print"
-                onclick="window.print()"
               >
                 Cetak / Simpan Laporan
               </button>
@@ -507,6 +524,11 @@
             ></nav>
           </div>
         </section>
+        <div
+          id="history-print-pages"
+          class="history-print-pages"
+          aria-hidden="true"
+        ></div>
       </main>
     </div>
 
