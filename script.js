@@ -384,11 +384,12 @@
     }
 
     pdf.autoTable({
-      startY: 38,
-      margin: { top: 38, right: 11, bottom: 15, left: 11 },
+      startY: 39,
+      margin: { top: 39, right: 7, bottom: 12, left: 7 },
       head: [["NO", "DOKUMEN", "TANGGAL", "KEYAKINAN", "DIGITAL/SCAN", "STATUS"]],
       body: rows.map(function (row, index) {
         const scanStatus = (row.scan_or_digital || "UNKNOWN").toUpperCase();
+        const classification = getClassificationLabel(row.ai_classification);
         return [
           index + 1,
           row.file_name || "-",
@@ -397,7 +398,7 @@
             ? "-"
             : row.persentase + "%",
           scanStatus + (row.scan_confidence ? "\n" + row.scan_confidence : ""),
-          (row.ai_classification || "PERLU REVIEW") +
+          classification.label +
             (row.scan_detail ? "\n" + row.scan_detail : ""),
         ];
       }),
@@ -418,16 +419,56 @@
         textColor: [100, 116, 139],
         fontStyle: "bold",
         lineColor: [219, 226, 234],
+        lineWidth: 0.25,
       },
       columnStyles: {
-        0: { cellWidth: 12, halign: "center" },
-        1: { cellWidth: 70 },
-        2: { cellWidth: 30 },
-        3: { cellWidth: 25, halign: "center" },
-        4: { cellWidth: 44 },
+        0: { cellWidth: 14, halign: "center" },
+        1: { cellWidth: 96 },
+        2: { cellWidth: 34 },
+        3: { cellWidth: 28, halign: "center" },
+        4: { cellWidth: 42 },
         5: { cellWidth: "auto" },
       },
       didParseCell: function (data) {
+        if (data.section === "body") {
+          if (data.column.index === 1) {
+            data.cell.styles.fontStyle = "bold";
+            data.cell.styles.textColor = [17, 24, 39];
+          }
+
+          if (data.column.index === 2) {
+            data.cell.styles.textColor = [100, 116, 139];
+          }
+
+          if (data.column.index === 3) {
+            data.cell.styles.fontStyle = "bold";
+            data.cell.styles.textColor = [79, 70, 229];
+          }
+
+          if (data.column.index === 4) {
+            data.cell.styles.fontStyle = "bold";
+            data.cell.styles.textColor = [51, 65, 85];
+          }
+
+          if (data.column.index === 5) {
+            const status = String(data.cell.raw || "")
+              .split("\n")[0]
+              .toUpperCase();
+            data.cell.styles.fontStyle = "bold";
+
+            if (status === "ASLI") {
+              data.cell.styles.fillColor = [220, 252, 231];
+              data.cell.styles.textColor = [22, 101, 52];
+            } else if (status === "PALSU") {
+              data.cell.styles.fillColor = [254, 226, 226];
+              data.cell.styles.textColor = [185, 28, 28];
+            } else {
+              data.cell.styles.fillColor = [226, 232, 240];
+              data.cell.styles.textColor = [51, 65, 85];
+            }
+          }
+        }
+
         if (
           data.section === "body" &&
           data.row.index === rows.length - 1
@@ -435,7 +476,7 @@
           data.cell.styles.lineWidth = {
             top: 0.2,
             right: 0.2,
-            bottom: 0,
+            bottom: 0.2,
             left: 0.2,
           };
         }
@@ -445,7 +486,7 @@
         const pageHeight = pdf.internal.pageSize.getHeight();
         pdf.setDrawColor(203, 213, 225);
         pdf.setLineWidth(0.4);
-        pdf.roundedRect(7, 7, pageWidth - 14, pageHeight - 14, 3, 3);
+        pdf.roundedRect(7, 7, pageWidth - 14, 25, 3, 3);
 
         if (logoData) {
           pdf.addImage(logoData, "PNG", 11, 11, 12, 12);
@@ -461,10 +502,14 @@
         pdf.setDrawColor(79, 70, 229);
         pdf.setLineWidth(0.6);
         pdf.line(11, 27, pageWidth - 11, 27);
+        pdf.setFillColor(248, 250, 252);
+        pdf.setDrawColor(219, 226, 234);
+        pdf.setLineWidth(0.3);
+        pdf.rect(7, 32, pageWidth - 14, 7, "FD");
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(9);
         pdf.setTextColor(17, 24, 39);
-        pdf.text("Laporan Riwayat Verifikasi", 11, 33);
+        pdf.text("Semua Riwayat", 11, 36.7);
         pdf.setFontSize(7);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(100, 116, 139);
