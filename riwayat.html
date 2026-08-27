@@ -31,8 +31,20 @@
 
       /* Khusus Print: Menyembunyikan elemen UI yang tidak perlu */
       @media print {
+        @page {
+          size: A4 landscape;
+          margin: 12mm;
+        }
+
         body * {
           visibility: hidden;
+        }
+
+        body {
+          margin: 0;
+          background: #fff;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
 
         /* Hanya tampilkan area tabel riwayat */
@@ -46,10 +58,28 @@
           left: 0;
           top: 0;
           width: 100%;
-          border: none;
-          box-shadow: none;
+          box-sizing: border-box;
+          overflow: hidden;
+          border: 1px solid #dbe2ea;
+          border-radius: 14px;
+          background: #fff;
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
           margin: 0;
-          padding: 20px;
+          padding: 0;
+        }
+
+        .table-head {
+          padding: 12px 14px;
+          border-bottom: 1px solid #e5e7eb;
+          background: #f8fafc;
+        }
+
+        .table-head h2 {
+          font-size: 16px;
+        }
+
+        .table-wrap {
+          overflow: hidden;
         }
 
         /* Sembunyikan tombol cetak saat diprint */
