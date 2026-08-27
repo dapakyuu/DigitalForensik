@@ -1319,6 +1319,12 @@ a {
   gap: 7px;
 }
 
+.history-table th:first-child,
+.history-table td:first-child {
+  width: 42px;
+  text-align: center;
+}
+
 .table-delete-action {
   border: 0;
   background: #fee2e2;

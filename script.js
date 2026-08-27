@@ -363,17 +363,23 @@
       return;
     }
 
+    const showRowNumber = options && options.showRowNumber;
+    const columnCount = showRowNumber ? 7 : 6;
+
     if (!rows || rows.length === 0) {
       target.innerHTML =
-        '<tr><td colspan="6" class="table-empty">Belum ada riwayat yang sesuai.</td></tr>';
+        '<tr><td colspan="' +
+        columnCount +
+        '" class="table-empty">Belum ada riwayat yang sesuai.</td></tr>';
       return;
     }
 
     const showOnlyDate = options && options.showOnlyDate;
     const allowDelete = options && options.allowDelete;
+    const rowNumberStart = (options && options.rowNumberStart) || 0;
 
     target.innerHTML = rows
-      .map(function (row) {
+      .map(function (row, rowIndex) {
         const classification = getClassificationLabel(row.ai_classification);
         const confidence =
           row.persentase === null || row.persentase === undefined
@@ -395,6 +401,7 @@
 
         return [
           "<tr class='history-row-multiple-lines'>",
+          showRowNumber ? "<td>" + (rowNumberStart + rowIndex + 1) + "</td>" : "",
           "<td>" + escapeHtml(row.file_name) + "</td>",
           "<td>" + createdAt + "</td>",
           "<td>" + confidence + "</td>",
@@ -454,6 +461,8 @@
     renderHistoryRows(historyTableBody, pageRows, {
       showOnlyDate: true,
       allowDelete: true,
+      showRowNumber: true,
+      rowNumberStart: startIndex,
     });
 
     if (historyPaginationInfo) {
