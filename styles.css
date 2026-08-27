@@ -1484,6 +1484,40 @@ th {
   color: #9aa3b2;
 }
 
+.table-sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.table-sort-button::after {
+  content: "↕";
+  color: #cbd5e1;
+  font-size: 11px;
+}
+
+.table-sort-button.active::after {
+  content: "↑";
+  color: var(--indigo-600);
+}
+
+.table-sort-button.active.desc::after {
+  content: "↓";
+}
+
+.table-sort-button:hover,
+.table-sort-button:focus-visible {
+  color: var(--indigo-600);
+}
+
 td {
   font-weight: 600;
 }

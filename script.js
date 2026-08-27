@@ -42,11 +42,14 @@
   const historyPaginationInfo = document.getElementById(
     "history-pagination-info",
   );
+  const historySortButtons = document.querySelectorAll(".table-sort-button");
   const historyPrintDate = document.getElementById("history-print-date");
   let historyRowsCache = [];
   let historyCurrentPage = 1;
   let historyPageSize = 10;
   let historyActiveSession = null;
+  let historySortKey = "created_at";
+  let historySortDirection = "desc";
 
   function updateHistoryPrintDate() {
     if (!historyPrintDate) {
@@ -265,7 +268,7 @@
       ? historySearchInput.value.trim().toLowerCase()
       : "";
 
-    return historyRowsCache.filter(function (row) {
+    const filteredRows = historyRowsCache.filter(function (row) {
       return [
         row.file_name,
         row.ai_classification,
@@ -276,7 +279,66 @@
         return String(value || "").toLowerCase().includes(query);
       });
     });
+
+    return filteredRows.sort(function (firstRow, secondRow) {
+      let firstValue = firstRow[historySortKey];
+      let secondValue = secondRow[historySortKey];
+
+      if (historySortKey === "created_at") {
+        firstValue = new Date(firstValue || 0).getTime();
+        secondValue = new Date(secondValue || 0).getTime();
+      } else if (historySortKey === "persentase") {
+        firstValue = Number(firstValue ?? -1);
+        secondValue = Number(secondValue ?? -1);
+      } else {
+        firstValue = String(firstValue || "").toLowerCase();
+        secondValue = String(secondValue || "").toLowerCase();
+      }
+
+      let comparison = 0;
+      if (typeof firstValue === "number" && typeof secondValue === "number") {
+        comparison = firstValue - secondValue;
+      } else {
+        comparison = firstValue.localeCompare(secondValue, "id", {
+          numeric: true,
+          sensitivity: "base",
+        });
+      }
+
+      return historySortDirection === "asc" ? comparison : -comparison;
+    });
   }
+
+  function updateHistorySortButtons() {
+    historySortButtons.forEach(function (button) {
+      const isActive = button.dataset.sortKey === historySortKey;
+      button.classList.toggle("active", isActive);
+      button.classList.toggle(
+        "desc",
+        isActive && historySortDirection === "desc",
+      );
+      button.setAttribute(
+        "aria-label",
+        "Urutkan " +
+          button.textContent.trim() +
+          (isActive
+            ? historySortDirection === "asc"
+              ? " menurun"
+              : " menaik"
+            : " menaik"),
+      );
+      button.closest("th").setAttribute(
+        "aria-sort",
+        isActive
+          ? historySortDirection === "asc"
+            ? "ascending"
+            : "descending"
+          : "none",
+      );
+    });
+  }
+
+  updateHistorySortButtons();
 
   async function loadImageDataUrl(path) {
     const response = await fetch(path);
@@ -1019,6 +1081,23 @@
       renderHistoryPagination();
     });
   }
+
+  historySortButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      const selectedKey = button.dataset.sortKey;
+
+      if (historySortKey === selectedKey) {
+        historySortDirection = historySortDirection === "asc" ? "desc" : "asc";
+      } else {
+        historySortKey = selectedKey;
+        historySortDirection = "asc";
+      }
+
+      historyCurrentPage = 1;
+      updateHistorySortButtons();
+      renderHistoryPagination();
+    });
+  });
 
   if (historyPageSizeSelect) {
     historyPageSize = Number(historyPageSizeSelect.value) || 10;

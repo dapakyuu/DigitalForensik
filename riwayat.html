@@ -145,17 +145,19 @@
           width: 100%;
           box-sizing: border-box;
           overflow: visible;
-          border: 1px solid #dbe2ea;
-          border-radius: 14px;
+          border: 0;
+          border-radius: 0;
           background: #fff;
-          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+          box-shadow: none;
           margin: 0;
           padding: 0;
         }
 
         .table-head {
           padding: 12px 14px;
+          border-right: 1px solid #dbe2ea;
           border-bottom: 1px solid #e5e7eb;
+          border-left: 1px solid #dbe2ea;
           background: #f8fafc;
         }
 
@@ -164,9 +166,11 @@
           align-items: flex-start;
           justify-content: space-between;
           gap: 16px;
-          margin: 0 14px;
-          padding: 14px 0 12px;
+          margin: 0;
+          padding: 14px;
+          border: 1px solid #dbe2ea;
           border-bottom: 2px solid #4f46e5;
+          border-radius: 14px 14px 0 0;
         }
 
         .history-print-brand {
@@ -260,8 +264,13 @@
         td {
           padding: 6px 8px !important;
           border: 0 !important;
+          border-right: 1px solid #eef2f7 !important;
           line-height: 1.2;
           vertical-align: middle;
+        }
+        th:first-child,
+        td:first-child {
+          border-left: 1px solid #dbe2ea !important;
         }
         th {
           font-size: 9px;
@@ -283,7 +292,9 @@
           page-break-inside: avoid;
           break-inside: avoid;
         }
-        tbody tr:last-child td { border-bottom: 0 !important; }
+        tbody tr:last-child td {
+          border-bottom: 1px solid #dbe2ea !important;
+        }
       }
     </style>
   </head>
@@ -497,11 +508,11 @@
               <thead>
                 <tr>
                   <th>NO</th>
-                  <th>DOKUMEN</th>
-                  <th>TANGGAL</th>
-                  <th>KEYAKINAN</th>
-                  <th>DIGITAL/SCAN</th>
-                  <th>STATUS</th>
+                  <th><button type="button" class="table-sort-button" data-sort-key="file_name">DOKUMEN</button></th>
+                  <th><button type="button" class="table-sort-button" data-sort-key="created_at">TANGGAL</button></th>
+                  <th><button type="button" class="table-sort-button" data-sort-key="persentase">KEYAKINAN</button></th>
+                  <th><button type="button" class="table-sort-button" data-sort-key="scan_or_digital">DIGITAL/SCAN</button></th>
+                  <th><button type="button" class="table-sort-button" data-sort-key="ai_classification">STATUS</button></th>
                   <th>AKSI</th>
                 </tr>
               </thead>
