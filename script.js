@@ -272,7 +272,7 @@
     }
 
     const rows = getFilteredHistoryRows();
-    const rowsPerPage = 12;
+    const rowsPerPage = 15;
     const pageCount = Math.max(1, Math.ceil(rows.length / rowsPerPage));
     const printedAt = new Date().toLocaleString("id-ID", {
       day: "2-digit",
