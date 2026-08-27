@@ -40,10 +40,28 @@
   const historyPaginationInfo = document.getElementById(
     "history-pagination-info",
   );
+  const historyPrintDate = document.getElementById("history-print-date");
   let historyRowsCache = [];
   let historyCurrentPage = 1;
   let historyPageSize = 10;
   let historyActiveSession = null;
+
+  function updateHistoryPrintDate() {
+    if (!historyPrintDate) {
+      return;
+    }
+
+    historyPrintDate.textContent = new Date().toLocaleString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  updateHistoryPrintDate();
+  window.addEventListener("beforeprint", updateHistoryPrintDate);
   const nav = document.getElementById("sidebar-nav");
   const logoutBtn = document.getElementById("logout-btn");
   const supabaseClient =

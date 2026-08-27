@@ -29,6 +29,10 @@
         background: #eef0fd;
       }
 
+      .history-print-header {
+        display: none;
+      }
+
       /* Khusus Print: Menyembunyikan elemen UI yang tidak perlu */
       @media print {
         @page {
@@ -83,6 +87,54 @@
           padding: 12px 14px;
           border-bottom: 1px solid #e5e7eb;
           background: #f8fafc;
+        }
+
+        .history-print-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 16px;
+          margin: 0 14px;
+          padding: 14px 0 12px;
+          border-bottom: 2px solid #4f46e5;
+        }
+
+        .history-print-brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .history-print-logo {
+          width: 38px;
+          height: 38px;
+          object-fit: contain;
+        }
+
+        .history-print-brand strong {
+          display: block;
+          color: #111827;
+          font-size: 15px;
+        }
+
+        .history-print-brand span,
+        .history-print-date span {
+          display: block;
+          color: #64748b;
+          font-size: 9px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .history-print-date {
+          text-align: right;
+        }
+
+        .history-print-date strong {
+          display: block;
+          margin-top: 4px;
+          color: #111827;
+          font-size: 10px;
         }
 
         .table-head h2 {
@@ -287,6 +339,23 @@
         </header>
 
         <section class="table-section">
+          <div class="history-print-header">
+            <div class="history-print-brand">
+              <img
+                class="history-print-logo"
+                src="assets/logo.png"
+                alt="Logo Forensa"
+              />
+              <div>
+                <strong>Forensa</strong>
+                <span>Layanan Verifikasi Dokumen Akademik</span>
+              </div>
+            </div>
+            <div class="history-print-date">
+              <span>Tanggal Cetak</span>
+              <strong id="history-print-date">-</strong>
+            </div>
+          </div>
           <div class="table-head">
             <h2>Semua Riwayat</h2>
             <button
@@ -295,7 +364,7 @@
               class="btn-print"
               onclick="window.print()"
             >
-              Cetak Laporan
+              Cetak / Simpan Laporan
             </button>
           </div>
 
