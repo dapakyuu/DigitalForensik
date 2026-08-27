@@ -223,6 +223,26 @@
             </button>
           </div>
 
+          <div class="history-toolbar">
+            <label class="history-search">
+              <span>Cari</span>
+              <input
+                id="history-search-input"
+                type="search"
+                placeholder="Cari nama dokumen, status, atau jenis PDF..."
+                autocomplete="off"
+              />
+            </label>
+            <label class="history-page-size">
+              <span>Baris per halaman</span>
+              <select id="history-page-size-select">
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </label>
+          </div>
+
           <div class="table-wrap">
             <table>
               <thead>
@@ -237,12 +257,20 @@
               </thead>
               <tbody id="history-table-body">
                 <tr>
-                  <td colspan="4" class="table-empty">
+                  <td colspan="6" class="table-empty">
                     Memuat data riwayat...
                   </td>
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="history-pagination-wrap">
+            <p id="history-pagination-info" class="history-pagination-info"></p>
+            <nav
+              id="history-pagination"
+              class="history-pagination"
+              aria-label="Navigasi halaman riwayat"
+            ></nav>
           </div>
         </section>
       </main>

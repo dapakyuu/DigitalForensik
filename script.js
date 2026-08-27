@@ -32,12 +32,71 @@
     "dashboard-history-body",
   );
   const historyTableBody = document.getElementById("history-table-body");
+  const historySearchInput = document.getElementById("history-search-input");
+  const historyPageSizeSelect = document.getElementById(
+    "history-page-size-select",
+  );
+  const historyPagination = document.getElementById("history-pagination");
+  const historyPaginationInfo = document.getElementById(
+    "history-pagination-info",
+  );
+  let historyRowsCache = [];
+  let historyCurrentPage = 1;
+  let historyPageSize = 10;
+  let historyActiveSession = null;
   const nav = document.getElementById("sidebar-nav");
   const logoutBtn = document.getElementById("logout-btn");
   const supabaseClient =
     typeof window.getSupabaseClient === "function"
       ? window.getSupabaseClient()
       : null;
+
+  function initPasswordToggles() {
+    const eyeIcon = [
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">',
+      '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12"></path>',
+      '<circle cx="12" cy="12" r="3"></circle>',
+      "</svg>",
+    ].join("");
+    const eyeOffIcon = [
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">',
+      '<path d="M3 3l18 18"></path>',
+      '<path d="M10.6 10.7a2 2 0 0 0 2.7 2.7"></path>',
+      '<path d="M9.9 4.2A10.8 10.8 0 0 1 12 4c6.5 0 10 8 10 8a18.5 18.5 0 0 1-2.1 3.2"></path>',
+      '<path d="M6.6 6.6C3.7 8.5 2 12 2 12s3.5 8 10 8a9.8 9.8 0 0 0 4.1-.9"></path>',
+      "</svg>",
+    ].join("");
+
+    document.querySelectorAll('input[type="password"]').forEach(function (input) {
+      const wrapper = input.closest(".input-group");
+      if (!wrapper || wrapper.querySelector(".password-toggle")) {
+        return;
+      }
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "password-toggle";
+      button.setAttribute("aria-label", "Tampilkan password");
+      button.setAttribute("aria-pressed", "false");
+      button.innerHTML = eyeIcon;
+      wrapper.classList.add("has-password-toggle");
+
+      button.addEventListener("click", function () {
+        const shouldShow = input.type === "password";
+        input.type = shouldShow ? "text" : "password";
+        button.setAttribute(
+          "aria-label",
+          shouldShow ? "Sembunyikan password" : "Tampilkan password",
+        );
+        button.setAttribute("aria-pressed", String(shouldShow));
+        button.innerHTML = shouldShow ? eyeOffIcon : eyeIcon;
+      });
+
+      wrapper.appendChild(button);
+    });
+  }
+
+  initPasswordToggles();
 
   // ---------- Sidebar mobile (hamburger) ----------
   (function initMobileSidebar() {
@@ -258,6 +317,12 @@
     return { label: value || "PERLU REVIEW", badgeClass: "neutral" };
   }
 
+  function escapeHtml(value) {
+    const element = document.createElement("div");
+    element.textContent = value === null || value === undefined ? "" : String(value);
+    return element.innerHTML;
+  }
+
   function renderHistoryRows(target, rows, options) {
     if (!target) {
       return;
@@ -265,11 +330,12 @@
 
     if (!rows || rows.length === 0) {
       target.innerHTML =
-        '<tr><td colspan="5" class="table-empty">Belum ada riwayat untuk akun ini.</td></tr>';
+        '<tr><td colspan="6" class="table-empty">Belum ada riwayat yang sesuai.</td></tr>';
       return;
     }
 
     const showOnlyDate = options && options.showOnlyDate;
+    const allowDelete = options && options.allowDelete;
 
     target.innerHTML = rows
       .map(function (row) {
@@ -294,28 +360,110 @@
 
         return [
           "<tr class='history-row-multiple-lines'>",
-          "<td>" + row.file_name + "</td>",
+          "<td>" + escapeHtml(row.file_name) + "</td>",
           "<td>" + createdAt + "</td>",
           "<td>" + confidence + "</td>",
           '<td><div style="font-weight:700; color:#111827;">' +
             scanText +
             '</div><div style="font-size:11px; color:#64748b; margin-top:2px;">' +
-            (row.scan_confidence ? row.scan_confidence.toUpperCase() : "-") +
+            escapeHtml(row.scan_confidence ? row.scan_confidence.toUpperCase() : "-") +
             "</div></td>",
           '<td><span class="badge ' +
             classification.badgeClass +
             '">' +
             classification.label +
             '</span><div style="font-size:11px; color:#64748b; margin-top:6px;">' +
-            (row.scan_detail ? row.scan_detail : "Tidak ada info scan") +
+            escapeHtml(row.scan_detail ? row.scan_detail : "Tidak ada info scan") +
             "</div></td>",
-          '<td><a class="table-action" href="' +
+          '<td><div class="history-actions"><a class="table-action" href="' +
             detailUrl +
-            '">Detail</a></td>',
+            '">Detail</a>' +
+            (allowDelete
+              ? '<button type="button" class="table-action table-delete-action" data-history-id="' +
+                escapeHtml(row.id) +
+                '" data-file-name="' +
+                escapeHtml(row.file_name) +
+                '">Hapus</button>'
+              : "") +
+            "</div></td>",
           "</tr>",
         ].join("");
       })
       .join("");
+  }
+
+  function renderHistoryPagination() {
+    if (!historyTableBody) {
+      return;
+    }
+
+    const query = historySearchInput
+      ? historySearchInput.value.trim().toLowerCase()
+      : "";
+    const filteredRows = historyRowsCache.filter(function (row) {
+      return [
+        row.file_name,
+        row.ai_classification,
+        row.scan_or_digital,
+        row.scan_detail,
+      ].some(function (value) {
+        return String(value || "").toLowerCase().includes(query);
+      });
+    });
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / historyPageSize));
+    historyCurrentPage = Math.min(historyCurrentPage, totalPages);
+    const startIndex = (historyCurrentPage - 1) * historyPageSize;
+    const pageRows = filteredRows.slice(startIndex, startIndex + historyPageSize);
+
+    renderHistoryRows(historyTableBody, pageRows, {
+      showOnlyDate: true,
+      allowDelete: true,
+    });
+
+    if (historyPaginationInfo) {
+      const firstRow = filteredRows.length ? startIndex + 1 : 0;
+      const lastRow = Math.min(startIndex + historyPageSize, filteredRows.length);
+      historyPaginationInfo.textContent =
+        "Menampilkan " + firstRow + "-" + lastRow + " dari " + filteredRows.length + " riwayat";
+    }
+
+    if (!historyPagination) {
+      return;
+    }
+
+    const buttons = [];
+    buttons.push(
+      '<button type="button" class="history-page-btn" data-page="' +
+        (historyCurrentPage - 1) +
+        '"' +
+        (historyCurrentPage === 1 ? " disabled" : "") +
+        ">Sebelumnya</button>",
+    );
+
+    for (let page = 1; page <= totalPages; page += 1) {
+      buttons.push(
+        '<button type="button" class="history-page-btn' +
+          (page === historyCurrentPage ? " active" : "") +
+          '" data-page="' +
+          page +
+          '" aria-label="Halaman ' +
+          page +
+          '"' +
+          (page === historyCurrentPage ? ' aria-current="page"' : "") +
+          ">" +
+          page +
+          "</button>",
+      );
+    }
+
+    buttons.push(
+      '<button type="button" class="history-page-btn" data-page="' +
+        (historyCurrentPage + 1) +
+        '"' +
+        (historyCurrentPage === totalPages ? " disabled" : "") +
+        ">Berikutnya</button>",
+    );
+    historyPagination.innerHTML = buttons.join("");
   }
 
   function formatPdfDate(value) {
@@ -410,6 +558,8 @@
     if (!supabaseClient || !session || !session.user) {
       return;
     }
+
+    historyActiveSession = session;
 
     const limit = currentPage === "dashboard.html" ? 3 : 1000;
 
@@ -507,10 +657,102 @@
     }
 
     if (historyTableBody) {
-      renderHistoryRows(historyTableBody, enrichedRows, {
-        showOnlyDate: true,
-      });
+      historyRowsCache = enrichedRows;
+      renderHistoryPagination();
     }
+  }
+
+  async function deleteHistoryItem(historyId, fileName) {
+    if (!supabaseClient || !historyActiveSession) {
+      await showMessage("error", "Sesi tidak tersedia", "Silakan login kembali.");
+      return;
+    }
+
+    let confirmed = false;
+
+    if (window.Swal) {
+      const result = await Swal.fire({
+        icon: "warning",
+        title: "Hapus riwayat?",
+        text: 'Riwayat "' + fileName + '" akan dihapus permanen.',
+        showCancelButton: true,
+        confirmButtonText: "Ya, hapus",
+        cancelButtonText: "Batal",
+        confirmButtonColor: "#dc2626",
+      });
+      confirmed = result.isConfirmed;
+    } else {
+      confirmed = window.confirm(
+        'Hapus riwayat "' + fileName + '"? Tindakan ini tidak dapat dibatalkan.',
+      );
+    }
+
+    if (!confirmed) {
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from("history")
+      .delete()
+      .eq("id", historyId)
+      .eq("user_id", historyActiveSession.user.id);
+
+    if (error) {
+      await showMessage("error", "Riwayat gagal dihapus", error.message);
+      return;
+    }
+
+    historyRowsCache = historyRowsCache.filter(function (row) {
+      return row.id !== historyId;
+    });
+    renderHistoryPagination();
+    await showMessage(
+      "success",
+      "Riwayat dihapus",
+      "Data riwayat berhasil dihapus.",
+    );
+  }
+
+  if (historySearchInput) {
+    historySearchInput.addEventListener("input", function () {
+      historyCurrentPage = 1;
+      renderHistoryPagination();
+    });
+  }
+
+  if (historyPageSizeSelect) {
+    historyPageSize = Number(historyPageSizeSelect.value) || 10;
+    historyPageSizeSelect.addEventListener("change", function () {
+      historyPageSize = Number(historyPageSizeSelect.value) || 10;
+      historyCurrentPage = 1;
+      renderHistoryPagination();
+    });
+  }
+
+  if (historyPagination) {
+    historyPagination.addEventListener("click", function (event) {
+      const button = event.target.closest("[data-page]");
+      if (!button || button.disabled) {
+        return;
+      }
+
+      historyCurrentPage = Number(button.dataset.page) || 1;
+      renderHistoryPagination();
+    });
+  }
+
+  if (historyTableBody) {
+    historyTableBody.addEventListener("click", function (event) {
+      const deleteButton = event.target.closest("[data-history-id]");
+      if (!deleteButton) {
+        return;
+      }
+
+      deleteHistoryItem(
+        deleteButton.dataset.historyId,
+        deleteButton.dataset.fileName || "dokumen ini",
+      );
+    });
   }
 
   async function loadProfileForm(session) {
