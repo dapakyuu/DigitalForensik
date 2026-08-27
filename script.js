@@ -27,7 +27,8 @@
   const verifyForm = document.getElementById("verify-form");
   const resetPasswordFields = document.getElementById("reset-password-fields");
   const profileForm = document.getElementById("profile-form");
-  const downloadReportBtn = document.getElementById("download-report-btn");
+  const saveHistoryPdfBtn = document.getElementById("btn-save-history-pdf");
+  const saveDetailPdfBtn = document.getElementById("btn-save-detail-pdf");
   const dashboardHistoryBody = document.getElementById(
     "dashboard-history-body",
   );
@@ -172,6 +173,72 @@
     }
 
     console.error("SweetAlert2 tidak termuat:", title, text);
+  }
+
+  function sanitizePdfFileName(value) {
+    return String(value || "laporan")
+      .replace(/\.pdf$/i, "")
+      .replace(/[^a-z0-9-_]+/gi, "-")
+      .replace(/^-+|-+$/g, "")
+      .toLowerCase() || "laporan";
+  }
+
+  async function saveElementAsPdf(element, fileName, orientation) {
+    if (!element || !window.html2canvas || !window.jspdf) {
+      throw new Error("Library pembuat PDF belum berhasil dimuat.");
+    }
+
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+
+    await new Promise(function (resolve) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(resolve);
+      });
+    });
+
+    const canvas = await window.html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      logging: false,
+    });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: orientation,
+      unit: "mm",
+      format: "a4",
+      compress: true,
+    });
+    const margin = 8;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const printableWidth = pageWidth - margin * 2;
+    const printableHeight = pageHeight - margin * 2;
+    const imageHeight = (canvas.height * printableWidth) / canvas.width;
+    const imageData = canvas.toDataURL("image/jpeg", 0.94);
+    let renderedHeight = 0;
+
+    do {
+      pdf.addImage(
+        imageData,
+        "JPEG",
+        margin,
+        margin - renderedHeight,
+        printableWidth,
+        imageHeight,
+        undefined,
+        "FAST",
+      );
+      renderedHeight += printableHeight;
+
+      if (renderedHeight < imageHeight) {
+        pdf.addPage();
+      }
+    } while (renderedHeight < imageHeight);
+
+    pdf.save(fileName);
   }
 
   function buildAbsolutePath(path) {
@@ -1251,21 +1318,52 @@
     });
   }
 
-  if (downloadReportBtn) {
-    downloadReportBtn.addEventListener("click", async function () {
-      const session = await getSession();
+  if (saveHistoryPdfBtn) {
+    saveHistoryPdfBtn.addEventListener("click", async function () {
+      const originalText = saveHistoryPdfBtn.textContent;
+      saveHistoryPdfBtn.disabled = true;
+      saveHistoryPdfBtn.textContent = "Membuat PDF...";
+      updateHistoryPrintDate();
+      document.body.classList.add("pdf-exporting");
 
-      if (!session) {
-        await showMessage(
-          "warning",
-          "Sesi habis",
-          "Silakan login kembali untuk mengunduh laporan.",
+      try {
+        await saveElementAsPdf(
+          document.querySelector(".table-section"),
+          "laporan-riwayat-forensa.pdf",
+          "landscape",
         );
-        window.location.href = "login.html";
-        return;
+      } catch (error) {
+        await showMessage("error", "PDF gagal dibuat", error.message);
+      } finally {
+        document.body.classList.remove("pdf-exporting");
+        saveHistoryPdfBtn.disabled = false;
+        saveHistoryPdfBtn.textContent = originalText;
       }
+    });
+  }
 
-      await exportHistoryPdf(session);
+  if (saveDetailPdfBtn) {
+    saveDetailPdfBtn.addEventListener("click", async function () {
+      const originalText = saveDetailPdfBtn.textContent;
+      const detailFileName = document.getElementById("detail-file-name");
+      const safeName = sanitizePdfFileName(
+        detailFileName ? detailFileName.textContent : "detail",
+      );
+      saveDetailPdfBtn.disabled = true;
+      saveDetailPdfBtn.textContent = "Membuat PDF...";
+
+      try {
+        await saveElementAsPdf(
+          document.getElementById("reportRoot"),
+          "laporan-detail-" + safeName + ".pdf",
+          "portrait",
+        );
+      } catch (error) {
+        await showMessage("error", "PDF gagal dibuat", error.message);
+      } finally {
+        saveDetailPdfBtn.disabled = false;
+        saveDetailPdfBtn.textContent = originalText;
+      }
     });
   }
 

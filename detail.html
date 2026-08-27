@@ -35,10 +35,17 @@
       /* Tombol Aksi Atas */
       .top-actions {
         display: flex;
-        justify-content: flex-end;
+        align-items: center;
+        justify-content: space-between;
         gap: 10px;
         margin-bottom: 16px;
         flex-wrap: wrap;
+      }
+      .report-export-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
       }
       .btn {
         border: none;
@@ -293,33 +300,70 @@
           padding: 8px 6px;
         }
         .top-actions {
-          justify-content: flex-start;
+          align-items: stretch;
+          flex-direction: column;
         }
         .top-actions .btn {
           flex: 1 1 auto;
+          justify-content: center;
+        }
+        .report-export-actions {
+          width: 100%;
         }
       }
 
       /* Khusus Print: Menyembunyikan sidebar dan navigasi saat dicetak */
       @media print {
-        body * {
-          visibility: hidden;
+        @page {
+          size: A4 portrait;
+          margin: 12mm;
         }
-        #reportRoot, #reportRoot * {
-          visibility: visible;
+
+        html,
+        body {
+          height: auto !important;
+          min-height: 0 !important;
+          margin: 0;
+          overflow: visible !important;
+          background: #fff;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
-        #reportRoot {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          border: none;
-          box-shadow: none;
-          padding: 0;
-        }
-        .sidebar, .dashboard-header, .top-actions {
+
+        .mobile-topbar,
+        .sidebar-overlay,
+        .sidebar,
+        .dashboard-header,
+        .top-actions {
           display: none !important;
         }
+
+        .dashboard-layout,
+        .dashboard-main {
+          display: block !important;
+          width: 100% !important;
+          min-height: 0 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: visible !important;
+        }
+
+        #reportRoot {
+          position: static;
+          width: 100%;
+          box-sizing: border-box;
+          margin: 0;
+          padding: 24px 26px;
+          border: 1px solid #dbe2ea;
+          border-radius: 14px;
+          background: #fff;
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+          break-after: avoid-page;
+          page-break-after: avoid;
+          -webkit-box-decoration-break: clone;
+          box-decoration-break: clone;
+        }
+
         .report-meta-card {
           page-break-inside: avoid;
           break-inside: avoid;
@@ -438,8 +482,15 @@
         </header>
 
         <div class="top-actions">
-          <button class="btn btn-ghost" onclick="window.print()">Cetak / Simpan PDF</button>
           <a class="btn btn-primary" href="riwayat.html">Kembali ke Riwayat</a>
+          <div class="report-export-actions">
+            <button id="btn-save-detail-pdf" class="btn btn-primary" type="button">
+              Simpan PDF
+            </button>
+            <button class="btn btn-ghost" type="button" onclick="window.print()">
+              Cetak Laporan
+            </button>
+          </div>
         </div>
 
         <!-- ID yang digunakan dipertahankan agar script.js tetap bisa memasukkan datanya -->
@@ -520,6 +571,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="script.js"></script>
