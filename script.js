@@ -241,6 +241,159 @@
     pdf.save(fileName);
   }
 
+  window.saveForensaElementAsPdf = saveElementAsPdf;
+
+  function getFilteredHistoryRows() {
+    const query = historySearchInput
+      ? historySearchInput.value.trim().toLowerCase()
+      : "";
+
+    return historyRowsCache.filter(function (row) {
+      return [
+        row.file_name,
+        row.ai_classification,
+        row.scan_or_digital,
+        row.scan_detail,
+        getHistoryDateSearchText(row.created_at),
+      ].some(function (value) {
+        return String(value || "").toLowerCase().includes(query);
+      });
+    });
+  }
+
+  async function loadImageDataUrl(path) {
+    const response = await fetch(path);
+    if (!response.ok) {
+      throw new Error("Logo laporan tidak dapat dimuat.");
+    }
+
+    const blob = await response.blob();
+    return await new Promise(function (resolve, reject) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        resolve(reader.result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function saveHistoryAsPdf() {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      throw new Error("Library pembuat PDF belum berhasil dimuat.");
+    }
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    if (typeof pdf.autoTable !== "function") {
+      throw new Error("Library tabel PDF belum berhasil dimuat.");
+    }
+
+    const rows = getFilteredHistoryRows();
+    const printedAt = new Date().toLocaleString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    let logoData = null;
+    try {
+      logoData = await loadImageDataUrl("assets/logo.png");
+    } catch (error) {
+      console.warn(error.message);
+    }
+
+    pdf.autoTable({
+      startY: 38,
+      margin: { top: 38, right: 11, bottom: 15, left: 11 },
+      head: [["NO", "DOKUMEN", "TANGGAL", "KEYAKINAN", "DIGITAL/SCAN", "STATUS"]],
+      body: rows.map(function (row, index) {
+        const scanStatus = (row.scan_or_digital || "UNKNOWN").toUpperCase();
+        return [
+          index + 1,
+          row.file_name || "-",
+          formatDateOnly(row.created_at),
+          row.persentase === null || row.persentase === undefined
+            ? "-"
+            : row.persentase + "%",
+          scanStatus + (row.scan_confidence ? "\n" + row.scan_confidence : ""),
+          (row.ai_classification || "PERLU REVIEW") +
+            (row.scan_detail ? "\n" + row.scan_detail : ""),
+        ];
+      }),
+      theme: "grid",
+      rowPageBreak: "avoid",
+      showHead: "everyPage",
+      styles: {
+        font: "helvetica",
+        fontSize: 7.5,
+        cellPadding: 2.2,
+        lineColor: [226, 232, 240],
+        lineWidth: 0.2,
+        textColor: [30, 41, 59],
+        valign: "middle",
+      },
+      headStyles: {
+        fillColor: [248, 250, 252],
+        textColor: [100, 116, 139],
+        fontStyle: "bold",
+        lineColor: [219, 226, 234],
+      },
+      columnStyles: {
+        0: { cellWidth: 12, halign: "center" },
+        1: { cellWidth: 70 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 25, halign: "center" },
+        4: { cellWidth: 44 },
+        5: { cellWidth: "auto" },
+      },
+      didDrawPage: function (data) {
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        pdf.setDrawColor(203, 213, 225);
+        pdf.setLineWidth(0.4);
+        pdf.roundedRect(7, 7, pageWidth - 14, pageHeight - 14, 3, 3);
+
+        if (logoData) {
+          pdf.addImage(logoData, "PNG", 11, 11, 12, 12);
+        }
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(12);
+        pdf.setTextColor(17, 24, 39);
+        pdf.text("Forensa", 26, 15.5);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(7);
+        pdf.setTextColor(100, 116, 139);
+        pdf.text("LAYANAN VERIFIKASI DOKUMEN AKADEMIK", 26, 20);
+        pdf.setDrawColor(79, 70, 229);
+        pdf.setLineWidth(0.6);
+        pdf.line(11, 27, pageWidth - 11, 27);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(9);
+        pdf.setTextColor(17, 24, 39);
+        pdf.text("Laporan Riwayat Verifikasi", 11, 33);
+        pdf.setFontSize(7);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(100, 116, 139);
+        pdf.text("Tanggal cetak", pageWidth - 11, 14, { align: "right" });
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(17, 24, 39);
+        pdf.text(printedAt, pageWidth - 11, 19, { align: "right" });
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(100, 116, 139);
+        pdf.text(
+          "Halaman " + data.pageNumber,
+          pageWidth - 11,
+          pageHeight - 9.5,
+          { align: "right" },
+        );
+      },
+    });
+
+    pdf.save("laporan-riwayat-forensa.pdf");
+  }
+
   function buildAbsolutePath(path) {
     return new URL(path, window.location.href).toString();
   }
@@ -524,20 +677,7 @@
       return;
     }
 
-    const query = historySearchInput
-      ? historySearchInput.value.trim().toLowerCase()
-      : "";
-    const filteredRows = historyRowsCache.filter(function (row) {
-      return [
-        row.file_name,
-        row.ai_classification,
-        row.scan_or_digital,
-        row.scan_detail,
-        getHistoryDateSearchText(row.created_at),
-      ].some(function (value) {
-        return String(value || "").toLowerCase().includes(query);
-      });
-    });
+    const filteredRows = getFilteredHistoryRows();
     const totalPages = Math.max(1, Math.ceil(filteredRows.length / historyPageSize));
     historyCurrentPage = Math.min(historyCurrentPage, totalPages);
     const startIndex = (historyCurrentPage - 1) * historyPageSize;
@@ -1324,18 +1464,12 @@
       saveHistoryPdfBtn.disabled = true;
       saveHistoryPdfBtn.textContent = "Membuat PDF...";
       updateHistoryPrintDate();
-      document.body.classList.add("pdf-exporting");
 
       try {
-        await saveElementAsPdf(
-          document.querySelector(".table-section"),
-          "laporan-riwayat-forensa.pdf",
-          "landscape",
-        );
+        await saveHistoryAsPdf();
       } catch (error) {
         await showMessage("error", "PDF gagal dibuat", error.message);
       } finally {
-        document.body.classList.remove("pdf-exporting");
         saveHistoryPdfBtn.disabled = false;
         saveHistoryPdfBtn.textContent = originalText;
       }

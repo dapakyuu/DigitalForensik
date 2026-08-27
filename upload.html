@@ -582,7 +582,7 @@
       }
 
       .report-meta-card:hover {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
       }
 
       .report-meta-card .meta-card-key {
@@ -677,10 +677,18 @@
 
       .top-actions {
         display: flex;
-        justify-content: flex-end;
+        align-items: center;
+        justify-content: space-between;
         gap: 10px;
         margin-bottom: 16px;
         flex-wrap: wrap;
+      }
+
+      .report-export-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
       }
 
       .err-box {
@@ -755,32 +763,69 @@
         .result-actions .btn {
           width: 100%;
         }
+        .top-actions {
+          align-items: stretch;
+          flex-direction: column;
+        }
+        .top-actions .btn {
+          flex: 1 1 auto;
+          justify-content: center;
+        }
+        .report-export-actions {
+          width: 100%;
+        }
       }
 
       /* Khusus Print: Menyembunyikan elemen UI saat dicetak */
       @media print {
-        body * {
-          visibility: hidden;
+        @page {
+          size: A4 portrait;
+          margin: 12mm;
         }
-        #reportRoot, #reportRoot * {
-          visibility: visible;
-        }
-        #reportRoot {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          border: none;
-          box-shadow: none;
-          padding: 0;
+
+        html,
+        body {
+          height: auto !important;
+          min-height: 0 !important;
           margin: 0;
+          overflow: visible !important;
+          background: #fff;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
-        /* Hilangkan elemen yang tidak perlu dari layout */
-        .sidebar, 
-        .dashboard-header, 
-        .top-actions, 
+
+        .mobile-topbar,
+        .sidebar-overlay,
+        .sidebar,
+        .dashboard-header,
+        .top-actions,
         .page-head {
           display: none !important;
+        }
+
+        .dashboard-layout,
+        .dashboard-main,
+        #screen-laporan {
+          display: block !important;
+          width: 100% !important;
+          min-height: 0 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: visible !important;
+        }
+
+        #reportRoot {
+          position: static;
+          width: 100%;
+          box-sizing: border-box;
+          margin: 0;
+          padding: 24px 26px;
+          border: 1px solid #dbe2ea;
+          border-radius: 14px;
+          background: #fff;
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+          -webkit-box-decoration-break: clone;
+          box-decoration-break: clone;
         }
         /* Mencegah card metadata terpotong di tengah-tengah halaman saat diprint */
         .report-meta-card {
@@ -800,7 +845,12 @@
         aria-expanded="false"
         aria-controls="sidebar"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M4 7h16" />
           <path d="M4 12h16" />
           <path d="M4 17h16" />
@@ -827,7 +877,12 @@
               id="sidebar-close-btn"
               aria-label="Tutup menu navigasi"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M18 6 6 18" />
                 <path d="M6 6l12 12" />
               </svg>
@@ -1044,7 +1099,8 @@
                 <div class="result-score" id="resScorePct">–</div>
                 <div class="result-label" id="resLabel">–</div>
                 <div class="result-file" id="resScoreNote">
-                  Persentase menunjukkan tingkat keyakinan AI terhadap status dokumen tersebut (Asli/Palsu).
+                  Persentase menunjukkan tingkat keyakinan AI terhadap status
+                  dokumen tersebut (Asli/Palsu).
                 </div>
                 <div class="result-file" id="resFileLine">–</div>
                 <div class="result-actions">
@@ -1071,17 +1127,24 @@
             <p>Ringkasan, temuan model, dan rekomendasi.</p>
           </div>
           <div class="top-actions">
-            <button class="btn btn-ghost" id="printBtn">
-              Cetak / Simpan PDF
-            </button>
             <button class="btn btn-ghost" id="backToUploadBtn2">
               Analisis Dokumen Lain
             </button>
+            <div class="report-export-actions">
+              <button class="btn btn-primary" id="saveUploadPdfBtn">
+                Export PDF
+              </button>
+              <button class="btn btn-ghost" id="printBtn">
+                Cetak / Simpan Laporan
+              </button>
+            </div>
           </div>
           <div class="report" id="reportRoot">
             <div class="report-head">
               <div class="report-brand">
-                <div class="brand-mark"><img src="assets/logo.png" alt="" /></div>
+                <div class="brand-mark">
+                  <img src="assets/logo.png" alt="" />
+                </div>
                 <div class="report-brand-text">
                   <div class="name">Forensa</div>
                   <div class="sub">Layanan Verifikasi Dokumen Akademik</div>
@@ -1180,6 +1243,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="script.js"></script>
@@ -1223,11 +1288,28 @@
           if (normalized.startsWith("D:")) normalized = normalized.slice(2);
           normalized = normalized.replace(/'/g, "");
 
-          let match = normalized.match(/^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})(Z|[+-][0-9]{2})([0-9]{2})?$/);
+          let match = normalized.match(
+            /^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})(Z|[+-][0-9]{2})([0-9]{2})?$/,
+          );
           if (match) {
-            const [, year, month, day, hour, minute, second, tzSign, tzHourMinute] = match;
-            const tzOffset = tzSign && tzHourMinute ? `${tzSign}${tzHourMinute.slice(0, 2)}:${tzHourMinute.slice(2, 4)}` : "";
-            const date = new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}${tzOffset}`);
+            const [
+              ,
+              year,
+              month,
+              day,
+              hour,
+              minute,
+              second,
+              tzSign,
+              tzHourMinute,
+            ] = match;
+            const tzOffset =
+              tzSign && tzHourMinute
+                ? `${tzSign}${tzHourMinute.slice(0, 2)}:${tzHourMinute.slice(2, 4)}`
+                : "";
+            const date = new Date(
+              `${year}-${month}-${day}T${hour}:${minute}:${second}${tzOffset}`,
+            );
             if (!Number.isNaN(date.getTime())) {
               return `${date.toLocaleDateString("id-ID", {
                 day: "2-digit",
@@ -1364,12 +1446,16 @@
           {
             key: "Scan / Digital",
             value: fmtMetaValue(metadata.scan_or_digital),
-            desc: metadata.scan_detail || "Status PDF scan atau digital berdasarkan ekstraksi teks halaman.",
+            desc:
+              metadata.scan_detail ||
+              "Status PDF scan atau digital berdasarkan ekstraksi teks halaman.",
           },
           {
             key: "Scan Confidence",
             value: fmtMetaValue(metadata.scan_confidence),
-            desc: metadata.scan_impact_note || "Tingkat keyakinan dari klasifikasi scan/digital.",
+            desc:
+              metadata.scan_impact_note ||
+              "Tingkat keyakinan dari klasifikasi scan/digital.",
           },
           {
             key: "Scan Detail",
@@ -1386,7 +1472,7 @@
                 <div class="meta-card-key">${row.key}</div>
                 <div class="meta-card-value">${row.value}</div>
                 <div class="meta-card-desc">${row.desc}</div>
-              </div>`
+              </div>`,
           )
           .join("");
       }
@@ -1599,6 +1685,46 @@
       document
         .getElementById("printBtn")
         .addEventListener("click", () => window.print());
+      document
+        .getElementById("saveUploadPdfBtn")
+        .addEventListener("click", async function () {
+          const button = this;
+          const originalText = button.textContent;
+          const safeName = String(apiResult?.nama_file || "analisis-dokumen")
+            .replace(/\.pdf$/i, "")
+            .replace(/[^a-z0-9-_]+/gi, "-")
+            .replace(/^-+|-+$/g, "")
+            .toLowerCase();
+
+          button.disabled = true;
+          button.textContent = "Membuat PDF...";
+
+          try {
+            if (typeof window.saveForensaElementAsPdf !== "function") {
+              throw new Error("Fitur pembuat PDF belum berhasil dimuat.");
+            }
+
+            await window.saveForensaElementAsPdf(
+              document.getElementById("reportRoot"),
+              "laporan-analisis-" + (safeName || "dokumen") + ".pdf",
+              "portrait",
+            );
+          } catch (error) {
+            if (window.Swal) {
+              await Swal.fire({
+                icon: "error",
+                title: "PDF gagal dibuat",
+                text: error.message,
+                confirmButtonColor: "#4f46e5",
+              });
+            } else {
+              window.alert(error.message);
+            }
+          } finally {
+            button.disabled = false;
+            button.textContent = originalText;
+          }
+        });
 
       function resetFlow() {
         selectedFile = null;
@@ -1623,16 +1749,22 @@
           { day: "2-digit", month: "long", year: "numeric" },
         );
 
-        const scanStatus = apiResult.scan_or_digital || apiResult.metadata?.scan_or_digital || "UNKNOWN";
-        const scanDetail = apiResult.scan_detail || apiResult.metadata?.scan_detail || "Status scan/digital tidak tersedia.";
+        const scanStatus =
+          apiResult.scan_or_digital ||
+          apiResult.metadata?.scan_or_digital ||
+          "UNKNOWN";
+        const scanDetail =
+          apiResult.scan_detail ||
+          apiResult.metadata?.scan_detail ||
+          "Status scan/digital tidak tersedia.";
 
         document.getElementById("repSummary").textContent =
           `${apiResult.nama_file} diperiksa menggunakan model AI (LSTM) yang menganalisis pola byte berkas. ` +
           (isAmbigu
             ? "Model berada tepat di ambang 50%, sehingga hasilnya ambigu dan perlu pemeriksaan lanjutan. "
             : isAsli
-              // UBAH: dari "skor kepalsuan" menjadi "tingkat keyakinan"
-              ? `Model menyimpulkan dokumen ini cenderung asli, dengan tingkat keyakinan ${pct}%. `
+              ? // UBAH: dari "skor kepalsuan" menjadi "tingkat keyakinan"
+                `Model menyimpulkan dokumen ini cenderung asli, dengan tingkat keyakinan ${pct}%. `
               : `Model menyimpulkan dokumen ini cenderung palsu, dengan tingkat keyakinan ${pct}%. `) +
           `Informasi tambahan: PDF terdeteksi sebagai ${scanStatus}. ${scanDetail}`;
 
@@ -1653,16 +1785,16 @@
             : "Lebih dekat ke pola palsu";
         const levelEl = document.getElementById("repFindingLevel");
         let levelClass = "lvl-netral",
-            levelText = "Ambigu";
-            
+          levelText = "Ambigu";
+
         if (isAsli) {
           levelClass = "lvl-rendah"; // Hijau (Aman)
-          levelText = `Keyakinan ${pct >= 80 ? 'Tinggi' : 'Sedang'}`;
+          levelText = `Keyakinan ${pct >= 80 ? "Tinggi" : "Sedang"}`;
         } else if (isPalsu) {
           levelClass = "lvl-tinggi"; // Merah (Bahaya)
-          levelText = `Keyakinan ${pct >= 80 ? 'Tinggi' : 'Sedang'}`;
+          levelText = `Keyakinan ${pct >= 80 ? "Tinggi" : "Sedang"}`;
         }
-        
+
         levelEl.className = "lvl " + levelClass;
         levelEl.textContent = levelText;
 
