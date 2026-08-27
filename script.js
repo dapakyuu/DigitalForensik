@@ -418,15 +418,16 @@
         fillColor: [248, 250, 252],
         textColor: [100, 116, 139],
         fontStyle: "bold",
+        halign: "center",
         lineColor: [219, 226, 234],
         lineWidth: 0.25,
       },
       columnStyles: {
         0: { cellWidth: 14, halign: "center" },
         1: { cellWidth: 96 },
-        2: { cellWidth: 34 },
+        2: { cellWidth: 34, halign: "center" },
         3: { cellWidth: 28, halign: "center" },
-        4: { cellWidth: 42 },
+        4: { cellWidth: 42, halign: "center" },
         5: { cellWidth: "auto" },
       },
       didParseCell: function (data) {
@@ -484,9 +485,13 @@
       didDrawPage: function (data) {
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
+        const tableBottom = Math.min(
+          (data.cursor && data.cursor.y ? data.cursor.y : pageHeight - 10) + 1.5,
+          pageHeight - 7,
+        );
         pdf.setDrawColor(203, 213, 225);
         pdf.setLineWidth(0.4);
-        pdf.roundedRect(7, 7, pageWidth - 14, 25, 3, 3);
+        pdf.roundedRect(7, 7, pageWidth - 14, tableBottom - 7, 3, 3);
 
         if (logoData) {
           pdf.addImage(logoData, "PNG", 11, 11, 12, 12);
