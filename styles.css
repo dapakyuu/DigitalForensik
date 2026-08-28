@@ -32,6 +32,10 @@ a {
   color: inherit;
 }
 
+html, body, .landing-page {
+  scroll-behavior: smooth;
+}
+
 /* Landing page publik */
 .landing-page {
   min-height: 100vh;

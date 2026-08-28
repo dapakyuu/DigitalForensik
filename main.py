@@ -335,7 +335,7 @@ def _save_to_supabase(user_id: str, file_name: str, file_type: str, classificati
             "user_id": user_id,
             "file_name": file_name,
             "file_type": file_type,
-            "persentase": round(confidence_score * 100, 2),
+            "persentase": confidence_score * 100,
             "ai_classification": classification,
             "raw_probability": float(raw_probability),
         }
