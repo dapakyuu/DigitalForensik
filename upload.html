@@ -663,6 +663,8 @@
         padding-top: 16px;
         margin-top: 6px;
         flex-wrap: wrap;
+        gap: 8px;
+        min-width: 0;
       }
       .report-foot .note {
         font-size: 11px;
@@ -673,6 +675,13 @@
         font-size: 10.5px;
         color: var(--ink-400);
         text-align: right;
+      }
+
+      .report-foot .note,
+      .report-foot .hashline {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-all;
       }
 
       .top-actions {
@@ -1251,9 +1260,9 @@
 
     <script>
       // ---------- Config ----------
-      const API_URL = "/api/verify/";
+      // const API_URL = "/api/verify/";
       // Development lokal (frontend dan backend berjalan di port berbeda):
-      // const API_URL = "http://127.0.0.1:8000/api/verify/";
+      const API_URL = "http://127.0.0.1:8000/api/verify/";
       const MAX_SIZE_MB = 10;
 
       // ---------- State ----------
@@ -1643,7 +1652,7 @@
 
         // Definisi konsisten di seluruh aplikasi:
         // skor = peluang kepalsuan dokumen (0..1), bukan kebalikan dari skor asli.
-        const pct = isAmbigu ? 50 : Math.round(rawScore * 100);
+        const pct = isAmbigu ? 50 : (rawScore * 100).toFixed(4);
 
         return { isAsli, isPalsu, isAmbigu, pct, rawScore };
       }
