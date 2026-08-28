@@ -39,7 +39,7 @@ app.add_middleware(
 )
 
 MODEL_PATH = "best_model_bilstm_both.keras"
-MAX_LEN = 50000
+MAX_LEN = 10000
 
 if not os.path.exists(MODEL_PATH):
     model = None
