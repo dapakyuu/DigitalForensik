@@ -38,7 +38,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MODEL_PATH = "best_model_bilstm_both.keras"
+MODEL_PATH = "model_bilstm_both_new.keras"
 MAX_LEN = 10000
 
 if not os.path.exists(MODEL_PATH):

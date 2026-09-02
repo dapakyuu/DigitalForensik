@@ -15,7 +15,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY main.py ./
-COPY best_model_bilstm_both.keras ./
+COPY model_bilstm_both_new.keras ./
 
 EXPOSE 8000
 
